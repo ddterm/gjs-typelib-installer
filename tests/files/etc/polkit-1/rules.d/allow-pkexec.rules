@@ -1,0 +1,9 @@
+// SPDX-FileCopyrightText: 2025 Aleksandr Mezin <mezin.alexander@gmail.com>
+//
+// SPDX-License-Identifier: MIT
+
+polkit.addRule(function(action, subject) {
+    if (action.id == "org.freedesktop.policykit.exec") {
+        return polkit.Result.YES;
+    }
+});

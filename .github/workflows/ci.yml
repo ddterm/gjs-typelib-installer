@@ -1,0 +1,98 @@
+# SPDX-FileCopyrightText: 2025 Aleksandr Mezin <mezin.alexander@gmail.com>
+#
+# SPDX-License-Identifier: MIT
+
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}/${{ github.ref }}
+
+jobs:
+  lint:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version-file: .nvmrc
+
+      - run: npm ci
+      - run: npm run lint
+
+      - uses: fsfe/reuse-action@676e2d560c9a403aa252096d99fcab3e1132b0f5 # v6.0.0
+
+  test:
+    runs-on: ubuntu-24.04
+    needs: lint
+    timeout-minutes: 10
+
+    strategy:
+      fail-fast: false
+      matrix:
+        image:
+          - fedora-43
+
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - run: systemctl --user enable --now podman.socket
+
+      - run: podman compose build "$SERVICE"
+        env:
+          SERVICE: ${{ matrix.image }}-packagekit
+
+      - run: podman compose build "$SERVICE"
+        env:
+          SERVICE: ${{ matrix.image }}
+
+      - run: podman compose up -d "$SERVICE"
+        env:
+          SERVICE: ${{ matrix.image }}-packagekit
+
+      - run: podman wait --latest --condition=healthy
+      - run: podman exec --latest -u testuser ./sequence.sh
+
+      - run: podman compose down "$SERVICE"
+        env:
+          SERVICE: ${{ matrix.image }}-packagekit
+
+      - run: podman compose up -d "$SERVICE"
+        env:
+          SERVICE: ${{ matrix.image }}-packagekit
+
+      - run: podman wait --latest --condition=healthy
+      - run: podman exec --latest -u testuser ./sequence2.sh
+
+      - run: podman compose down "$SERVICE"
+        env:
+          SERVICE: ${{ matrix.image }}-packagekit
+
+      - run: podman compose up -d "$SERVICE"
+        env:
+          SERVICE: ${{ matrix.image }}
+
+      - run: podman wait --latest --condition=healthy
+      - run: podman exec --latest -u testuser ./sequence.sh
+
+      - run: podman compose down "$SERVICE"
+        env:
+          SERVICE: ${{ matrix.image }}
+
+      - run: podman compose up -d "$SERVICE"
+        env:
+          SERVICE: ${{ matrix.image }}
+
+      - run: podman wait --latest --condition=healthy
+      - run: podman exec --latest -u testuser ./sequence2.sh
+
+      - run: podman compose down "$SERVICE"
+        env:
+          SERVICE: ${{ matrix.image }}
