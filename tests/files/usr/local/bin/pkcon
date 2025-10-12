@@ -1,8 +1,0 @@
-#!/bin/sh
-
-# SPDX-FileCopyrightText: 2025 Aleksandr Mezin <mezin.alexander@gmail.com>
-# SPDX-License-Identifier: MIT
-
-# pkcon tries to read input from tty, not stdin
-
-exec /usr/bin/pkcon -y "$@"

@@ -37,14 +37,7 @@ async function main() {
 
         print(argv.map(v => GLib.shell_quote(v)).join(' '));
 
-        const subprocess = Gio.Subprocess.new(argv, Gio.SubprocessFlags.STDIN_PIPE);
-        const stdin = subprocess.get_stdin_pipe();
-
-        try {
-            for (;;)
-                stdin.write_all('y\n', null);
-        } catch {
-        }
+        const subprocess = Gio.Subprocess.new(argv, Gio.SubprocessFlags.STDIN_INHERIT);
 
         subprocess.wait_check(null);
     }

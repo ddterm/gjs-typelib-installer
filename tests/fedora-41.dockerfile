@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-FROM quay.io/fedora/fedora:43 AS base
+FROM quay.io/fedora/fedora:41 AS base
 
 RUN dnf install -y --nodocs --setopt install_weak_deps=False systemd gjs polkit expect
 

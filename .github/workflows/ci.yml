@@ -38,7 +38,19 @@ jobs:
       fail-fast: false
       matrix:
         image:
+          - fedora-41
+          - fedora-42
           - fedora-43
+          - ubuntu-24.04
+          - ubuntu-25.04
+          - ubuntu-25.10
+          - debian-stable
+          - debian-testing
+          - debian-sid
+          - opensuse-leap-15.6
+          - opensuse-leap-16.0
+          - opensuse-tumbleweed
+          - archlinux
 
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -59,10 +71,7 @@ jobs:
 
       - run: podman wait --latest --condition=healthy
       - run: podman exec --latest -u testuser ./sequence.sh
-
-      - run: podman compose down "$SERVICE"
-        env:
-          SERVICE: ${{ matrix.image }}-packagekit
+      - run: podman compose down
 
       - run: podman compose up -d "$SERVICE"
         env:
@@ -70,10 +79,7 @@ jobs:
 
       - run: podman wait --latest --condition=healthy
       - run: podman exec --latest -u testuser ./sequence2.sh
-
-      - run: podman compose down "$SERVICE"
-        env:
-          SERVICE: ${{ matrix.image }}-packagekit
+      - run: podman compose down
 
       - run: podman compose up -d "$SERVICE"
         env:
@@ -81,10 +87,7 @@ jobs:
 
       - run: podman wait --latest --condition=healthy
       - run: podman exec --latest -u testuser ./sequence.sh
-
-      - run: podman compose down "$SERVICE"
-        env:
-          SERVICE: ${{ matrix.image }}
+      - run: podman compose down
 
       - run: podman compose up -d "$SERVICE"
         env:
@@ -92,7 +95,4 @@ jobs:
 
       - run: podman wait --latest --condition=healthy
       - run: podman exec --latest -u testuser ./sequence2.sh
-
-      - run: podman compose down "$SERVICE"
-        env:
-          SERVICE: ${{ matrix.image }}
+      - run: podman compose down

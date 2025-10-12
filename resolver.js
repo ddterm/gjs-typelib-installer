@@ -101,7 +101,7 @@ export const packages = {
             arch: 'vte3',
             debian: 'gir1.2-vte-2.91',
             fedora: 'vte291',
-            suse: 'typelib-1_0-Vte-2.91',
+            suse: 'typelib-1_0-Vte-2_91',
         }),
         '3.91': () => resolveByOsId('Vte-3.91.typelib', {
             alpine: 'vte3-gtk4',

@@ -30,6 +30,34 @@ x-service-base: &x-service-base
       - is-system-running
 
 services:
+  fedora-41:
+    <<: *x-service-base
+    build:
+      context: tests
+      dockerfile: fedora-41.dockerfile
+      target: base
+
+  fedora-41-packagekit:
+    <<: *x-service-base
+    build:
+      context: tests
+      dockerfile: fedora-41.dockerfile
+      target: packagekit
+
+  fedora-42:
+    <<: *x-service-base
+    build:
+      context: tests
+      dockerfile: fedora-42.dockerfile
+      target: base
+
+  fedora-42-packagekit:
+    <<: *x-service-base
+    build:
+      context: tests
+      dockerfile: fedora-42.dockerfile
+      target: packagekit
+
   fedora-43:
     <<: *x-service-base
     build:
@@ -42,4 +70,144 @@ services:
     build:
       context: tests
       dockerfile: fedora-43.dockerfile
+      target: packagekit
+
+  ubuntu-24.04:
+    <<: *x-service-base
+    build:
+      context: tests
+      dockerfile: ubuntu-24.04.dockerfile
+      target: base
+
+  ubuntu-24.04-packagekit:
+    <<: *x-service-base
+    build:
+      context: tests
+      dockerfile: ubuntu-24.04.dockerfile
+      target: packagekit
+
+  ubuntu-25.04:
+    <<: *x-service-base
+    build:
+      context: tests
+      dockerfile: ubuntu-25.04.dockerfile
+      target: base
+
+  ubuntu-25.04-packagekit:
+    <<: *x-service-base
+    build:
+      context: tests
+      dockerfile: ubuntu-25.04.dockerfile
+      target: packagekit
+
+  ubuntu-25.10:
+    <<: *x-service-base
+    build:
+      context: tests
+      dockerfile: ubuntu-25.10.dockerfile
+      target: base
+
+  ubuntu-25.10-packagekit:
+    <<: *x-service-base
+    build:
+      context: tests
+      dockerfile: ubuntu-25.10.dockerfile
+      target: packagekit
+
+  debian-stable:
+    <<: *x-service-base
+    build:
+      context: tests
+      dockerfile: debian-stable.dockerfile
+      target: base
+
+  debian-stable-packagekit:
+    <<: *x-service-base
+    build:
+      context: tests
+      dockerfile: debian-stable.dockerfile
+      target: packagekit
+
+  debian-testing:
+    <<: *x-service-base
+    build:
+      context: tests
+      dockerfile: debian-testing.dockerfile
+      target: base
+
+  debian-testing-packagekit:
+    <<: *x-service-base
+    build:
+      context: tests
+      dockerfile: debian-testing.dockerfile
+      target: packagekit
+
+  debian-sid:
+    <<: *x-service-base
+    build:
+      context: tests
+      dockerfile: debian-sid.dockerfile
+      target: base
+
+  debian-sid-packagekit:
+    <<: *x-service-base
+    build:
+      context: tests
+      dockerfile: debian-sid.dockerfile
+      target: packagekit
+
+  opensuse-leap-15.6:
+    <<: *x-service-base
+    build:
+      context: tests
+      dockerfile: opensuse-leap-15.6.dockerfile
+      target: base
+
+  opensuse-leap-15.6-packagekit:
+    <<: *x-service-base
+    build:
+      context: tests
+      dockerfile: opensuse-leap-15.6.dockerfile
+      target: packagekit
+
+  opensuse-leap-16.0:
+    <<: *x-service-base
+    build:
+      context: tests
+      dockerfile: opensuse-leap-16.0.dockerfile
+      target: base
+
+  opensuse-leap-16.0-packagekit:
+    <<: *x-service-base
+    build:
+      context: tests
+      dockerfile: opensuse-leap-16.0.dockerfile
+      target: packagekit
+
+  opensuse-tumbleweed:
+    <<: *x-service-base
+    build:
+      context: tests
+      dockerfile: opensuse-tumbleweed.dockerfile
+      target: base
+
+  opensuse-tumbleweed-packagekit:
+    <<: *x-service-base
+    build:
+      context: tests
+      dockerfile: opensuse-tumbleweed.dockerfile
+      target: packagekit
+
+  archlinux:
+    <<: *x-service-base
+    build:
+      context: tests
+      dockerfile: archlinux.dockerfile
+      target: base
+
+  archlinux-packagekit:
+    <<: *x-service-base
+    build:
+      context: tests
+      dockerfile: archlinux.dockerfile
       target: packagekit

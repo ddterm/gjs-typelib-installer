@@ -2,9 +2,9 @@
 #
 # SPDX-License-Identifier: MIT
 
-FROM quay.io/fedora/fedora:43 AS base
+FROM ghcr.io/archlinux/archlinux AS base
 
-RUN dnf install -y --nodocs --setopt install_weak_deps=False systemd gjs polkit expect
+RUN pacman -Syu --noconfirm systemd gjs polkit expect
 
 COPY files /
 
@@ -12,12 +12,12 @@ RUN systemctl set-default multi-user.target && \
 	systemctl mask systemd-oomd low-memory-monitor rtkit-daemon udisks2 getty console-getty systemd-udev-trigger systemd-udevd && \
 	chmod u+rw /etc/shadow && \
 	truncate --size 0 /etc/machine-id && \
-	adduser -m -U -G users testuser
+	useradd -m -U -G users testuser
 
 STOPSIGNAL SIGRTMIN+3
 CMD ["/sbin/init"]
 
 FROM base AS packagekit
 
-RUN dnf install -y --nodocs --setopt install_weak_deps=False PackageKit && \
+RUN pacman -Syu --noconfirm packagekit && \
 	rm /etc/polkit-1/rules.d/allow-pkexec.rules

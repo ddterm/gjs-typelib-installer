@@ -10,12 +10,19 @@ dotest() {
 	echo '::endgroup::'
 }
 
+. /etc/os-release
+
+case "$ID-$VERSION_ID" in
+ubuntu-24.04 | ubuntu-25.04 | debian-*)
+	SKIP_GTK3=1;;  # Gtk 3 is a dependency of gjs on these distros
+esac
+
 set -e
 
-dotest gjs ./install.js Pango=1.0
-dotest gjs ./install.js Gtk=3.0 Gdk=3.0
-dotest gjs ./install.js Handy=1
-dotest gjs ./install.js Gtk=4.0 Gdk=4.0
-dotest gjs ./install.js Adw=1
-dotest gjs ./install.js Vte=2.91
-dotest gjs ./install.js Vte=3.91
+[ "$SKIP_GTK3" = "1" ] || dotest ./yes.expect ./install.js Pango=1.0
+[ "$SKIP_GTK3" = "1" ] || dotest ./yes.expect ./install.js Gtk=3.0 Gdk=3.0
+dotest ./yes.expect ./install.js Handy=1
+dotest ./yes.expect ./install.js Gtk=4.0 Gdk=4.0
+dotest ./yes.expect ./install.js Adw=1
+dotest ./yes.expect ./install.js Vte=2.91
+dotest ./yes.expect ./install.js Vte=3.91

@@ -1,0 +1,34 @@
+#!/usr/bin/expect -f
+
+# SPDX-FileCopyrightText: 2025 Aleksandr Mezin <mezin.alexander@gmail.com>
+#
+# SPDX-License-Identifier: MIT
+
+set timeout -1
+
+spawn {*}$argv
+
+expect {
+    -ex {Proceed with changes?} {
+        send "y\n"
+        exp_continue
+    } -ex {Is this ok [y/N]:} {
+        send "y\n"
+        exp_continue
+    } -ex {Do you want to continue?} {
+        send "y\n"
+        exp_continue
+    } -ex {Continue?} {
+        send "y\n"
+        exp_continue
+    } -ex {Proceed with installation?} {
+        send "y\n"
+        exp_continue
+    } -re . {
+        exp_continue
+    } eof {
+    }
+}
+
+lassign [wait] pid spawnid os_error_flag value
+exit $value
