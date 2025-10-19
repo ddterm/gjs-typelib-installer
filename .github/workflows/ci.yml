@@ -29,35 +29,47 @@ jobs:
 
       - uses: fsfe/reuse-action@676e2d560c9a403aa252096d99fcab3e1132b0f5 # v6.0.0
 
-  test:
+  plan:
     runs-on: ubuntu-24.04
-    needs: lint
-    timeout-minutes: 10
+    timeout-minutes: 5
 
-    strategy:
-      fail-fast: false
-      matrix:
-        image:
-          - fedora-41
-          - fedora-42
-          - fedora-43
-          - ubuntu-24.04
-          - ubuntu-25.04
-          - ubuntu-25.10
-          - debian-stable
-          - debian-testing
-          - debian-sid
-          - opensuse-leap-15.6
-          - opensuse-leap-16.0
-          - opensuse-tumbleweed
-          - archlinux
+    outputs:
+      services: ${{ steps.compose.outputs.services }}
+      packagekit-services: ${{ steps.compose.outputs.packagekit-services }}
 
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
       - run: systemctl --user enable --now podman.socket
 
-      - run: podman compose build "$SERVICE"
+      - id: compose
+        run: |
+          services="$(podman compose --profile base config --services | sort | jq -cnR '[inputs]')"
+          echo "services=$services" | tee -a "$GITHUB_OUTPUT"
+
+          packagekit_services="$(podman compose --profile packagekit config --services | sort | jq -cnR '[inputs]')"
+          echo "packagekit-services=$packagekit_services" | tee -a "$GITHUB_OUTPUT"
+
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    needs:
+      - lint
+      - plan
+
+    strategy:
+      fail-fast: false
+      matrix:
+        image: ${{ fromJSON(needs.plan.outputs.services) }}
+
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - run: systemctl --user enable --now podman.socket
+
+      - id: packagekit
+        run: podman compose build "$SERVICE"
+        if: contains(needs.plan.outputs.packagekit-services, env.SERVICE)
         env:
           SERVICE: ${{ matrix.image }}-packagekit
 
@@ -66,20 +78,32 @@ jobs:
           SERVICE: ${{ matrix.image }}
 
       - run: podman compose up -d "$SERVICE"
+        if: steps.packagekit.outcome == 'success'
         env:
           SERVICE: ${{ matrix.image }}-packagekit
 
       - run: podman wait --latest --condition=healthy
+        if: steps.packagekit.outcome == 'success'
+
       - run: podman exec --latest -u testuser ./sequence.sh
-      - run: podman compose down
+        if: steps.packagekit.outcome == 'success'
+
+      - run: podman compose --profile packagekit down
+        if: steps.packagekit.outcome == 'success'
 
       - run: podman compose up -d "$SERVICE"
+        if: steps.packagekit.outcome == 'success'
         env:
           SERVICE: ${{ matrix.image }}-packagekit
 
       - run: podman wait --latest --condition=healthy
+        if: steps.packagekit.outcome == 'success'
+
       - run: podman exec --latest -u testuser ./sequence2.sh
-      - run: podman compose down
+        if: steps.packagekit.outcome == 'success'
+
+      - run: podman compose --profile packagekit down
+        if: steps.packagekit.outcome == 'success'
 
       - run: podman compose up -d "$SERVICE"
         env:
@@ -87,7 +111,7 @@ jobs:
 
       - run: podman wait --latest --condition=healthy
       - run: podman exec --latest -u testuser ./sequence.sh
-      - run: podman compose down
+      - run: podman compose --profile base down
 
       - run: podman compose up -d "$SERVICE"
         env:
@@ -95,4 +119,4 @@ jobs:
 
       - run: podman wait --latest --condition=healthy
       - run: podman exec --latest -u testuser ./sequence2.sh
-      - run: podman compose down
+      - run: podman compose --profile base down
