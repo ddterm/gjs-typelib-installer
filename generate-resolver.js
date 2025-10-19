@@ -53,7 +53,7 @@ async function main() {
     }).join('\n');
 
     const replacedText = srcText.replace(
-        /export const packages = {\n.*\n};/s,
+        /export const packages = {\n.*?\n};/s,
         `export const packages = {\n${replaceText}\n};`
     );
 
