@@ -8,11 +8,11 @@ const {GLib, Gio, GIRepository} = imports.gi;
 const System = imports.system;
 
 async function main() {
-    const resolver = await import('../resolver.js');
+    const resolver = await import(System.programArgs[0]);
     const installer = await import('../installer.js');
     const versions = {};
 
-    for (const arg of System.programArgs) {
+    for (const arg of System.programArgs.slice(1)) {
         const [namespace, version, ...extra] = arg.split('=');
 
         if (!version || extra.length)

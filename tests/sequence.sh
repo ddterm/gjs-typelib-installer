@@ -21,10 +21,18 @@ esac
 
 set -e
 
-[ "$SKIP_GTK3" = "1" ] || dotest ./yes.expect ./install.js Pango=1.0
-[ "$SKIP_GTK3" = "1" ] || dotest ./yes.expect ./install.js Gtk=3.0 Gdk=3.0
-dotest ./yes.expect ./install.js Handy=1
-dotest ./yes.expect ./install.js Gtk=4.0 Gdk=4.0
-dotest ./yes.expect ./install.js Adw=1
-dotest ./yes.expect ./install.js Vte=2.91
-[ "$BROKEN_VTE4" = "1" ] || dotest ./yes.expect ./install.js Vte=3.91
+../generate-resolver.js ../resolver.js /tmp/resolver.min.js Pango=1.0 Gtk=3.0 Gdk=3.0 Handy=1
+
+[ "$SKIP_GTK3" = "1" ] || dotest ./yes.expect ./install.js file:///tmp/resolver.min.js Pango=1.0
+[ "$SKIP_GTK3" = "1" ] || dotest ./yes.expect ./install.js file:///tmp/resolver.min.js Gtk=3.0 Gdk=3.0
+dotest ./yes.expect ./install.js file:///tmp/resolver.min.js Handy=1
+
+../generate-resolver.js ../resolver.js /tmp/resolver.min.js Gtk=4.0 Gdk=4.0 Adw=1
+
+dotest ./yes.expect ./install.js file:///tmp/resolver.min.js Gtk=4.0 Gdk=4.0
+dotest ./yes.expect ./install.js file:///tmp/resolver.min.js Adw=1
+
+../generate-resolver.js ../resolver.js /tmp/resolver.min.js Vte=2.91 Vte=3.91
+
+dotest ./yes.expect ./install.js file:///tmp/resolver.min.js Vte=2.91
+[ "$BROKEN_VTE4" = "1" ] || dotest ./yes.expect ./install.js file:///tmp/resolver.min.js Vte=3.91

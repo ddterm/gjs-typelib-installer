@@ -10,7 +10,7 @@ const {programInvocationName, programArgs, exit} = imports.system;
 async function main() {
     if (programArgs.length < 2) {
         printerr(
-            `Usage: ${programInvocationName} installer.js output-file.js namespace=version namespace=version ...`
+            `Usage: ${programInvocationName} resolver.js output-file.js namespace=version namespace=version ...`
         );
 
         return 1;
