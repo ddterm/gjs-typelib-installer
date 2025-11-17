@@ -8,8 +8,7 @@ const {GLib, Gio, GIRepository} = imports.gi;
 const System = imports.system;
 
 async function main() {
-    const resolver = await import(System.programArgs[0]);
-    const installer = await import('../installer.js');
+    const installer = await import(System.programArgs[0]);
     const versions = {};
 
     for (const arg of System.programArgs.slice(1)) {
@@ -22,11 +21,11 @@ async function main() {
     }
 
     try {
-        resolver.require(versions);
+        installer.require(versions);
 
         throw new Error(`Unexpected: import succeeded: ${JSON.stringify(versions)}`);
     } catch (error) {
-        if (!(error instanceof resolver.MissingDependencies))
+        if (!(error instanceof installer.MissingDependencies))
             throw error;
 
         if (error.files.size > 0)
@@ -42,7 +41,7 @@ async function main() {
         subprocess.wait_check(null);
     }
 
-    const found = resolver.require(versions);
+    const found = installer.require(versions);
     const giRepo = GIRepository.Repository.dup_default?.() ?? GIRepository.Repository.get_default?.();
 
     for (const [namespace, version] of Object.entries(versions)) {
@@ -59,7 +58,7 @@ async function main() {
 
         const typelibPath = giRepo.get_typelib_path(namespace);
         const typelibFileName = GLib.path_get_basename(typelibPath);
-        const expectedFileName = resolver.packages[namespace][version]().filename;
+        const expectedFileName = installer.packages[namespace][version]().filename;
 
         if (typelibFileName !== expectedFileName) {
             throw new Error(

@@ -4,6 +4,7 @@
 
 import GLib from 'gi://GLib';
 import Gio from 'gi://Gio';
+import Gi from 'gi';
 
 function getOsIds() {
     let osIds = [GLib.get_os_info('ID')];
@@ -17,6 +18,164 @@ function getOsIds() {
         osIds.push('debian');
 
     return osIds;
+}
+
+let cachedOsIds;
+
+function resolveByOsId(filename, distros) {
+    if (!cachedOsIds)
+        cachedOsIds = getOsIds();
+
+    for (const osId of cachedOsIds) {
+        const match = distros[osId];
+
+        if (match)
+            return {package: match, filename};
+    }
+
+    return {filename};
+}
+
+export const packages = {
+    Adw: {
+        '1': () => resolveByOsId('Adw-1.typelib', {
+            alpine: 'libadwaita',
+            arch: 'libadwaita',
+            debian: 'gir1.2-adw-1',
+            fedora: 'libadwaita',
+            suse: 'typelib-1_0-Adw-1',
+        }),
+    },
+    Gdk: {
+        '3.0': () => resolveByOsId('Gdk-3.0.typelib', {
+            alpine: 'gtk+3.0',
+            arch: 'gtk3',
+            debian: 'gir1.2-gtk-3.0',
+            fedora: 'gtk3',
+            suse: 'typelib-1_0-Gtk-3_0',
+        }),
+        '4.0': () => resolveByOsId('Gdk-4.0.typelib', {
+            alpine: 'gtk4.0',
+            arch: 'gtk4',
+            debian: 'gir1.2-gtk-4.0',
+            fedora: 'gtk4',
+            suse: 'typelib-1_0-Gtk-4_0',
+        }),
+    },
+    Gtk: {
+        '3.0': () => resolveByOsId('Gtk-3.0.typelib', {
+            alpine: 'gtk+3.0',
+            arch: 'gtk3',
+            debian: 'gir1.2-gtk-3.0',
+            fedora: 'gtk3',
+            suse: 'typelib-1_0-Gtk-3_0',
+        }),
+        '4.0': () => resolveByOsId('Gtk-4.0.typelib', {
+            alpine: 'gtk4.0',
+            arch: 'gtk4',
+            debian: 'gir1.2-gtk-4.0',
+            fedora: 'gtk4',
+            suse: 'typelib-1_0-Gtk-4_0',
+        }),
+    },
+    Handy: {
+        '1': () => resolveByOsId('Handy-1.typelib', {
+            alpine: 'libhandy1',
+            arch: 'libhandy',
+            debian: 'gir1.2-handy-1',
+            fedora: 'libhandy',
+            suse: 'typelib-1_0-Handy-1_0',
+        }),
+    },
+    Pango: {
+        '1.0': () => resolveByOsId('Pango-1.0.typelib', {
+            alpine: 'pango',
+            arch: 'pango',
+            debian: 'gir1.2-pango-1.0',
+            fedora: 'pango',
+            suse: 'typelib-1_0-Pango-1_0',
+        }),
+    },
+    Vte: {
+        '2.91': () => resolveByOsId('Vte-2.91.typelib', {
+            alpine: 'vte3',
+            arch: 'vte3',
+            debian: 'gir1.2-vte-2.91',
+            fedora: 'vte291',
+            suse: 'typelib-1_0-Vte-2_91',
+        }),
+        '3.91': () => resolveByOsId('Vte-3.91.typelib', {
+            alpine: 'vte3-gtk4',
+            arch: 'vte4',
+            debian: 'gir1.2-vte-3.91',
+            fedora: 'vte291-gtk4',
+            suse: 'typelib-1_0-Vte-3_91',
+        }),
+    },
+};
+
+export class MissingDependencies extends Error {
+    static #message(pkgs, files) {
+        const parts = [];
+
+        pkgs = Array.from(pkgs);
+        files = Array.from(files);
+
+        if (pkgs.length > 0)
+            parts.push(`Missing packages: ${pkgs.join(', ')}.`);
+
+        if (files.length > 0)
+            parts.push(`Missing files: ${files.join(', ')}.`);
+
+        return parts.join(' ');
+    }
+
+    constructor(pkgs, files) {
+        super(MissingDependencies.#message(pkgs, files));
+
+        this.name = 'MissingDependencies';
+        this.packages = new Set(pkgs);
+        this.files = new Set(files);
+    }
+};
+
+/**
+ * Import and return multiple GObject libraries.
+ *
+ * @param {object} versions - object mapping from GI namespace to version string
+ * @returns {object} object mapping from GI namespace to the imported module
+ * @throws {MissingDependencies|Error}
+ */
+export function require(versions) {
+    const found = {};
+    const missingPackages = new Set();
+    const missingFiles = new Set();
+
+    for (const [namespace, version] of Object.entries(versions)) {
+        const resolver = packages[namespace]?.[version];
+
+        if (!resolver)
+            throw new Error(`No definition for namespace ${namespace}, version ${version}`);
+
+        try {
+            found[namespace] = Gi.require(namespace, version);
+        } catch (error) {
+            if (!error?.message?.includes(`Requiring ${namespace}, version ${version}:`))
+                throw error;
+
+            const {package: pkg, filename} = resolver();
+
+            if (pkg)
+                missingPackages.add(pkg);
+            else
+                missingFiles.add(filename);
+        }
+    }
+
+    if (missingPackages.size > 0 || missingFiles.size > 0)
+        throw new MissingDependencies(missingPackages, missingFiles);
+
+    return found;
 }
 
 function shellJoin(argv) {
@@ -84,7 +243,7 @@ async function testPkcon(pkcon, cancellable) {
  *
  * @async
  * @param {Gio.Cancellable} cancellable
- * @returns {Promise<(packages: string[]) => string[]>} - the function that,
+ * @returns {Promise<(pkgs: string[]) => string[]>} - the function that,
  * given the list of packages, generates the installation command
  */
 export async function findInstallCommand(cancellable = null) {
@@ -95,7 +254,7 @@ export async function findInstallCommand(cancellable = null) {
     if (pkcon) {
         try {
             await testPkcon(pkcon, cancellable);
-            return packages => [pkcon, 'install', '-c', '1000', ...packages];
+            return pkgs => [pkcon, 'install', '-c', '1000', ...pkgs];
         } catch (ex) {
             logError(ex, `${pkcon} doesn't seem to work`);
         }
@@ -111,31 +270,31 @@ export async function findInstallCommand(cancellable = null) {
             const apk = GLib.find_program_in_path('apk');
 
             if (apk)
-                return packages => [pkexec, apk, '-U', 'add', ...packages];
+                return pkgs => [pkexec, apk, '-U', 'add', ...pkgs];
         } else if (os === 'arch') {
             const pacman = GLib.find_program_in_path('pacman');
 
             if (pacman)
-                return packages => [pkexec, pacman, '-Sy', ...packages];
+                return pkgs => [pkexec, pacman, '-Sy', ...pkgs];
         } else if (os === 'debian') {
             const apt = GLib.find_program_in_path('apt') ?? GLib.find_program_in_path('apt-get');
 
             if (apt) {
-                return packages => ['sh', '-c', [
+                return pkgs => ['sh', '-c', [
                     shellJoin([pkexec, apt, 'update']),
-                    shellJoin(['exec', pkexec, apt, 'install', ...packages]),
+                    shellJoin(['exec', pkexec, apt, 'install', ...pkgs]),
                 ].join(' && ')];
             }
         } else if (os === 'fedora') {
             const yum = GLib.find_program_in_path('dnf') ?? GLib.find_program_in_path('yum');
 
             if (yum)
-                return packages => [pkexec, yum, 'install', ...packages];
+                return pkgs => [pkexec, yum, 'install', ...pkgs];
         } else if (os === 'suse') {
             const zypper = GLib.find_program_in_path('zypper');
 
             if (zypper)
-                return packages => [pkexec, zypper, 'install', ...packages];
+                return pkgs => [pkexec, zypper, 'install', ...pkgs];
         }
     }
 
@@ -178,7 +337,7 @@ export async function findTerminalCommand(cancellable = null) {
  *
  * @async
  * @param {Gio.Cancellable} cancellable
- * @returns {Promise<(packages: string[]) => string[]>} - the function that,
+ * @returns {Promise<(pkgs: string[]) => string[]>} - the function that,
  * given the list of packages, generates the installation command
  */
 export async function findTerminalInstallCommand(cancellable = null) {
@@ -194,5 +353,5 @@ export async function findTerminalInstallCommand(cancellable = null) {
     if (!installCommand)
         return null;
 
-    return packages => terminalCommand(installCommand(packages));
+    return pkgs => terminalCommand(installCommand(pkgs));
 }
