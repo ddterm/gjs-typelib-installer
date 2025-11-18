@@ -73,50 +73,64 @@ jobs:
         env:
           SERVICE: ${{ matrix.image }}-packagekit
 
-      - run: podman compose build "$SERVICE"
+      - id: base
+        run: podman compose build "$SERVICE"
+        if: ${{ !cancelled() }}
         env:
           SERVICE: ${{ matrix.image }}
 
-      - run: podman compose up -d "$SERVICE"
-        if: steps.packagekit.outcome == 'success'
+      - id: packagekit-up
+        if: ${{ !cancelled() && steps.packagekit.outcome == 'success' }}
+        run: |
+          podman compose up -d "$SERVICE"
+          podman wait --latest --condition=healthy
         env:
           SERVICE: ${{ matrix.image }}-packagekit
 
-      - run: podman wait --latest --condition=healthy
-        if: steps.packagekit.outcome == 'success'
-
       - run: podman exec --latest -u testuser ./sequence.sh
-        if: steps.packagekit.outcome == 'success'
+        if: ${{ !cancelled() && steps.packagekit-up.outcome == 'success' }}
 
       - run: podman compose --profile packagekit down
-        if: steps.packagekit.outcome == 'success'
+        if: ${{ !cancelled() && steps.packagekit-up.outcome != 'skipped' }}
 
-      - run: podman compose up -d "$SERVICE"
-        if: steps.packagekit.outcome == 'success'
+      - id: packagekit-up-2
+        if: ${{ !cancelled() && steps.packagekit-up.outcome == 'success' }}
+        run: |
+          podman compose up -d "$SERVICE"
+          podman wait --latest --condition=healthy
         env:
           SERVICE: ${{ matrix.image }}-packagekit
 
-      - run: podman wait --latest --condition=healthy
-        if: steps.packagekit.outcome == 'success'
-
       - run: podman exec --latest -u testuser ./sequence2.sh
-        if: steps.packagekit.outcome == 'success'
+        if: ${{ !cancelled() && steps.packagekit-up-2.outcome == 'success' }}
 
       - run: podman compose --profile packagekit down
-        if: steps.packagekit.outcome == 'success'
+        if: ${{ !cancelled() && steps.packagekit-up-2.outcome != 'skipped' }}
 
-      - run: podman compose up -d "$SERVICE"
+      - id: base-up
+        if: ${{ !cancelled() && steps.base.outcome == 'success' }}
+        run: |
+          podman compose up -d "$SERVICE"
+          podman wait --latest --condition=healthy
         env:
           SERVICE: ${{ matrix.image }}
 
-      - run: podman wait --latest --condition=healthy
       - run: podman exec --latest -u testuser ./sequence.sh
-      - run: podman compose --profile base down
+        if: ${{ !cancelled() && steps.base-up.outcome == 'success' }}
 
-      - run: podman compose up -d "$SERVICE"
+      - run: podman compose --profile base down
+        if: ${{ !cancelled() && steps.base-up.outcome != 'skipped' }}
+
+      - id: base-up-2
+        if: ${{ !cancelled() && steps.base-up.outcome == 'success' }}
+        run: |
+          podman compose up -d "$SERVICE"
+          podman wait --latest --condition=healthy
         env:
           SERVICE: ${{ matrix.image }}
 
-      - run: podman wait --latest --condition=healthy
       - run: podman exec --latest -u testuser ./sequence2.sh
+        if: ${{ !cancelled() && steps.base-up-2.outcome == 'success' }}
+
       - run: podman compose --profile base down
+        if: ${{ !cancelled() && steps.base-up-2.outcome != 'skipped' }}
