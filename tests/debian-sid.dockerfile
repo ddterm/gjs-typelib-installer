@@ -4,7 +4,7 @@
 
 FROM docker.io/library/debian:sid AS base
 
-RUN apt-get update && apt-get install -y --no-install-recommends systemd gjs pkexec expect
+RUN apt-get update && apt-get install -y --no-install-recommends systemd gjs pkexec expect x11-common
 
 COPY files /
 
