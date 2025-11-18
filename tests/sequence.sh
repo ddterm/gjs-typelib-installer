@@ -13,7 +13,7 @@ dotest() {
 . /etc/os-release
 
 case "$ID-$VERSION_ID" in
-ubuntu-24.04 | ubuntu-25.04 | debian-*)
+ubuntu-24.04 | ubuntu-25.04 | debian-13)
 	SKIP_GTK3=1;;  # Gtk 3 is a dependency of gjs on these distros
 alpine-3.19.* | alpine-3.20.* | alpine-3.21.*)
 	BROKEN_VTE4=1;;  # https://gitlab.alpinelinux.org/alpine/aports/-/issues/17029
