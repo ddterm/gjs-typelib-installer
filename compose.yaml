@@ -48,20 +48,6 @@ x-service-packagekit: &x-service-packagekit
   profiles: [packagekit]
 
 services:
-  fedora-41:
-    <<: *x-service-base
-    build:
-      context: tests
-      dockerfile: fedora-41.dockerfile
-      target: base
-
-  fedora-41-packagekit:
-    <<: *x-service-packagekit
-    build:
-      context: tests
-      dockerfile: fedora-41.dockerfile
-      target: packagekit
-
   fedora-42:
     <<: *x-service-base
     build:
