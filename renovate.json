@@ -1,6 +1,22 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:recommended"
-  ]
+    "config:best-practices",
+    "config:js-app",
+    "security:minimumReleaseAgeNpm"
+  ],
+  "ignorePresets": [
+    ":ignoreModulesAndTests"
+  ],
+  "packageRules": [
+    {
+      "extends": [
+        "helpers:pinGitHubActionDigests"
+      ],
+      "versioning": "npm"
+    }
+  ],
+  "dockerfile": {
+    "enabled": false
+  }
 }
