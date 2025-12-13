@@ -216,13 +216,6 @@ services:
       dockerfile: archlinux.dockerfile
       target: packagekit
 
-  alpine-3.19:
-    <<: *x-service-openrc
-    build:
-      context: tests
-      dockerfile: alpine-3.19.dockerfile
-      target: base
-
   alpine-3.20:
     <<: *x-service-openrc
     build:
