@@ -15,7 +15,7 @@ dotest() {
 case "$ID-$VERSION_ID" in
 ubuntu-24.04 | ubuntu-25.04 | debian-13)
 	SKIP_GTK3=1;&  # Gtk 3 is a dependency of gjs on these distros. Fallthrough!
-alpine-3.20.* | alpine-3.21.* | alpine-3.22.* | fedora-42 | fedora-43 | opensuse-* | arch-*)
+alpine-3.20.* | alpine-3.21.* | alpine-3.22.* | fedora-42 | fedora-43 | centos-10 | opensuse-* | arch-*)
 	SKIP_FREEDESKTOP=1;;&  # cairo and other are dependencies of gjs
 alpine-3.20.* | alpine-3.21.*)
 	BROKEN_VTE4=1;;&  # https://gitlab.alpinelinux.org/alpine/aports/-/issues/17029

@@ -48,6 +48,20 @@ x-service-packagekit: &x-service-packagekit
   profiles: [packagekit]
 
 services:
+  centos-10:
+    <<: *x-service-base
+    build:
+      context: tests
+      dockerfile: centos-10.dockerfile
+      target: base
+
+  centos-10-packagekit:
+    <<: *x-service-packagekit
+    build:
+      context: tests
+      dockerfile: centos-10.dockerfile
+      target: packagekit
+
   fedora-42:
     <<: *x-service-base
     build:
