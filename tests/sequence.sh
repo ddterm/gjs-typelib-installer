@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # SPDX-FileCopyrightText: 2025 Aleksandr Mezin <mezin.alexander@gmail.com>
 #
@@ -14,12 +14,18 @@ dotest() {
 
 case "$ID-$VERSION_ID" in
 ubuntu-24.04 | ubuntu-25.04 | debian-13)
-	SKIP_GTK3=1;;  # Gtk 3 is a dependency of gjs on these distros
-alpine-3.19.* | alpine-3.20.* | alpine-3.21.*)
-	BROKEN_VTE4=1;;  # https://gitlab.alpinelinux.org/alpine/aports/-/issues/17029
+	SKIP_GTK3=1;&  # Gtk 3 is a dependency of gjs on these distros. Fallthrough!
+alpine-3.20.* | alpine-3.21.* | alpine-3.22.* | fedora-42 | fedora-43 | opensuse-* | arch-*)
+	SKIP_FREEDESKTOP=1;;&  # cairo and other are dependencies of gjs
+alpine-3.20.* | alpine-3.21.*)
+	BROKEN_VTE4=1;;&  # https://gitlab.alpinelinux.org/alpine/aports/-/issues/17029
 esac
 
 set -e
+
+../generate-installer.js ../installer.js /tmp/installer.min.js cairo=1.0
+
+[ "$SKIP_FREEDESKTOP" = "1" ] || dotest ./yes.expect ./install.js file:///tmp/installer.min.js cairo=1.0
 
 ../generate-installer.js ../installer.js /tmp/installer.min.js Pango=1.0 Gtk=3.0 Gdk=3.0 Handy=1
 

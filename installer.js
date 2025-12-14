@@ -87,6 +87,15 @@ export const packages = {
             suse: 'typelib-1_0-Handy-1_0',
         }),
     },
+    cairo: {
+        '1.0': () => resolveByOsId('cairo-1.0.typelib', {
+            alpine: 'gobject-introspection',
+            arch: 'gobject-introspection-runtime',
+            debian: 'gir1.2-freedesktop',
+            fedora: 'gobject-introspection',
+            suse: 'girepository-1_0',
+        }),
+    },
     Pango: {
         '1.0': () => resolveByOsId('Pango-1.0.typelib', {
             alpine: 'pango',

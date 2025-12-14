@@ -4,7 +4,7 @@
 
 FROM docker.io/library/alpine:3.22 AS base
 
-RUN apk add --update --no-cache openrc gjs dbus polkit expect
+RUN apk add --update --no-cache bash openrc gjs dbus polkit expect
 
 COPY files /
 
