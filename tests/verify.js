@@ -58,18 +58,20 @@ async function main() {
 
     for (const [namespace, versions] of Object.entries(installer.packages)) {
         for (const [version, resolveFunc] of Object.entries(versions)) {
-            const {package: packageName, filename} = resolveFunc();
+            const {packages, filename} = resolveFunc();
 
-            if (!packageName) {
-                printerr(`Skipping ${filename} - no known package`);
+            if (!packages) {
+                printerr(`Skipping ${JSON.stringify(filename)} - no known package`);
                 continue;
             }
 
-            printerr(`Verify that ${packageName} contains file ${filename}`);
+            printerr(
+                `Verify that ${JSON.stringify(packages)} contains file ${JSON.stringify(filename)}`
+            );
 
-            if (!listFiles(packageName).map(p => GLib.path_get_basename(p)).includes(filename)) {
+            if (!packages.flatMap(listFiles).map(p => GLib.path_get_basename(p)).includes(filename)) {
                 throw new Error(
-                    `${namespace} ${version}: file ${filename} is not provided by package ${packageName}`
+                    `${namespace} ${version}: file ${JSON.stringify(filename)} is not provided by packages ${JSON.stringify(packages)}`
                 );
             }
         }

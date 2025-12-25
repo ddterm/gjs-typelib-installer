@@ -40,10 +40,10 @@ function resolveByOsId(filename, distros) {
         cachedOsIds = getOsIds();
 
     for (const osId of cachedOsIds) {
-        const match = distros[osId];
+        const packages = distros[osId];
 
-        if (match !== undefined)
-            return {package: match, filename};
+        if (packages !== undefined)
+            return {packages, filename};
     }
 
     return {filename};
@@ -52,110 +52,109 @@ function resolveByOsId(filename, distros) {
 export const packages = {
     Adw: {
         '1': () => resolveByOsId('Adw-1.typelib', {
-            alpine: 'libadwaita',
-            arch: 'libadwaita',
-            debian: 'gir1.2-adw-1',
-            fedora: 'libadwaita',
-            suse: 'typelib-1_0-Adw-1',
+            alpine: ['libadwaita'],
+            arch: ['libadwaita'],
+            debian: ['gir1.2-adw-1'],
+            fedora: ['libadwaita'],
+            suse: ['typelib-1_0-Adw-1'],
         }),
     },
     Gdk: {
         '3.0': () => resolveByOsId('Gdk-3.0.typelib', {
-            alpine: 'gtk+3.0',
-            arch: 'gtk3',
-            debian: 'gir1.2-gtk-3.0',
-            fedora: 'gtk3',
-            suse: 'typelib-1_0-Gtk-3_0',
+            alpine: ['gtk+3.0'],
+            arch: ['gtk3'],
+            debian: ['gir1.2-gtk-3.0'],
+            fedora: ['gtk3'],
+            suse: ['typelib-1_0-Gtk-3_0'],
         }),
         '4.0': () => resolveByOsId('Gdk-4.0.typelib', {
-            alpine: 'gtk4.0',
-            arch: 'gtk4',
-            debian: 'gir1.2-gtk-4.0',
-            fedora: 'gtk4',
-            suse: 'typelib-1_0-Gtk-4_0',
+            alpine: ['gtk4.0'],
+            arch: ['gtk4'],
+            debian: ['gir1.2-gtk-4.0'],
+            fedora: ['gtk4'],
+            suse: ['typelib-1_0-Gtk-4_0'],
         }),
     },
     Gtk: {
         '3.0': () => resolveByOsId('Gtk-3.0.typelib', {
-            alpine: 'gtk+3.0',
-            arch: 'gtk3',
-            debian: 'gir1.2-gtk-3.0',
-            fedora: 'gtk3',
-            suse: 'typelib-1_0-Gtk-3_0',
+            alpine: ['gtk+3.0'],
+            arch: ['gtk3'],
+            debian: ['gir1.2-gtk-3.0'],
+            fedora: ['gtk3'],
+            suse: ['typelib-1_0-Gtk-3_0'],
         }),
         '4.0': () => resolveByOsId('Gtk-4.0.typelib', {
-            alpine: 'gtk4.0',
-            arch: 'gtk4',
-            debian: 'gir1.2-gtk-4.0',
-            fedora: 'gtk4',
-            suse: 'typelib-1_0-Gtk-4_0',
+            alpine: ['gtk4.0'],
+            arch: ['gtk4'],
+            debian: ['gir1.2-gtk-4.0'],
+            fedora: ['gtk4'],
+            suse: ['typelib-1_0-Gtk-4_0'],
         }),
     },
     Handy: {
         '1': () => resolveByOsId('Handy-1.typelib', {
-            alpine: 'libhandy1',
-            arch: 'libhandy',
-            debian: 'gir1.2-handy-1',
-            fedora: 'libhandy',
-            suse: 'typelib-1_0-Handy-1_0',
+            alpine: ['libhandy1'],
+            arch: ['libhandy'],
+            debian: ['gir1.2-handy-1'],
+            fedora: ['libhandy'],
+            suse: ['typelib-1_0-Handy-1_0'],
         }),
     },
     cairo: {
         '1.0': () => resolveByOsId('cairo-1.0.typelib', {
-            alpine: 'gobject-introspection',
-            arch: 'gobject-introspection-runtime',
-            debian: 'gir1.2-freedesktop',
-            fedora: 'gobject-introspection',
-            suse: 'girepository-1_0',
+            alpine: ['gobject-introspection'],
+            arch: ['gobject-introspection-runtime'],
+            debian: ['gir1.2-freedesktop'],
+            fedora: ['gobject-introspection'],
+            suse: ['girepository-1_0'],
         }),
     },
     Pango: {
         '1.0': () => resolveByOsId('Pango-1.0.typelib', {
-            alpine: 'pango',
-            arch: 'pango',
-            debian: 'gir1.2-pango-1.0',
-            fedora: 'pango',
-            suse: 'typelib-1_0-Pango-1_0',
+            alpine: ['pango'],
+            arch: ['pango'],
+            debian: ['gir1.2-pango-1.0'],
+            fedora: ['pango'],
+            suse: ['typelib-1_0-Pango-1_0'],
         }),
     },
     Vte: {
         '2.91': () => resolveByOsId('Vte-2.91.typelib', {
-            alpine: 'vte3',
-            arch: 'vte3',
-            debian: 'gir1.2-vte-2.91',
-            fedora: 'vte291',
-            suse: 'typelib-1_0-Vte-2_91',
+            alpine: ['vte3'],
+            arch: ['vte3'],
+            debian: ['gir1.2-vte-2.91'],
+            fedora: ['vte291'],
+            suse: ['typelib-1_0-Vte-2_91'],
         }),
         '3.91': () => resolveByOsId('Vte-3.91.typelib', {
-            alpine: 'vte3-gtk4',
-            'alpine:3.20': 'vte3', // https://gitlab.alpinelinux.org/alpine/aports/-/issues/17029
-            'alpine:3.21': 'vte3', // https://gitlab.alpinelinux.org/alpine/aports/-/issues/17029
-            arch: 'vte4',
-            debian: 'gir1.2-vte-3.91',
-            fedora: 'vte291-gtk4',
-            suse: 'typelib-1_0-Vte-3_91',
+            alpine: ['vte3-gtk4'],
+            // https://gitlab.alpinelinux.org/alpine/aports/-/issues/17029
+            'alpine:3.20': ['vte3', 'vte3-gtk4'],
+            'alpine:3.21': ['vte3', 'vte3-gtk4'],
+            arch: ['vte4'],
+            debian: ['gir1.2-vte-3.91'],
+            fedora: ['vte291-gtk4'],
+            suse: ['typelib-1_0-Vte-3_91'],
         }),
     },
     GioUnix: {
         '2.0': () => resolveByOsId('GioUnix-2.0.typelib', {
-            alpine: 'glib',
-            arch: 'glib2',
-            debian: 'gir1.2-glib-2.0',
-            fedora: 'glib2',
+            alpine: ['glib'],
+            arch: ['glib2'],
+            debian: ['gir1.2-glib-2.0'],
+            fedora: ['glib2'],
             'opensuse-leap:15': null,
-            'sled:15': null,
-            suse: 'typelib-1_0-Gio-2_0',
+            suse: ['typelib-1_0-Gio-2_0'],
         }),
     },
     GLibUnix: {
         '2.0': () => resolveByOsId('GLibUnix-2.0.typelib', {
-            alpine: 'glib',
-            arch: 'glib2',
-            debian: 'gir1.2-glib-2.0',
-            fedora: 'glib2',
+            alpine: ['glib'],
+            arch: ['glib2'],
+            debian: ['gir1.2-glib-2.0'],
+            fedora: ['glib2'],
             'opensuse-leap:15': null,
-            'sled:15': null,
-            suse: 'typelib-1_0-GLibUnix-2_0',
+            suse: ['typelib-1_0-GLibUnix-2_0'],
         }),
     },
 };
@@ -209,10 +208,10 @@ export function require(versions) {
             if (!error?.message?.includes(`Requiring ${namespace}, version ${version}:`))
                 throw error;
 
-            const {package: pkg, filename} = resolver();
+            const {packages: pkgs, filename} = resolver();
 
-            if (pkg)
-                missingPackages.add(pkg);
+            if (pkgs)
+                missingPackages.add(...pkgs);
             else
                 missingFiles.add(filename);
         }
