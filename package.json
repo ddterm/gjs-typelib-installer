@@ -22,6 +22,7 @@
     },
     "scripts": {
         "lint": "eslint",
-        "eslint": "eslint"
+        "eslint": "eslint",
+        "test": "tests/verify.js"
     }
 }

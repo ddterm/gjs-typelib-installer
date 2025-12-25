@@ -6,8 +6,21 @@ import GLib from 'gi://GLib';
 import Gio from 'gi://Gio';
 import Gi from 'gi';
 
+function getVersionPrefix(version) {
+    const index = version.lastIndexOf('.');
+
+    return index === -1 ? '' : version.slice(0, index);
+}
+
 function getOsIds() {
-    let osIds = [GLib.get_os_info('ID')];
+    let osIds = [];
+    let osId = GLib.get_os_info('ID');
+    let osVersionId = GLib.get_os_info('VERSION_ID');
+
+    for (let prefix = osVersionId; prefix; prefix = getVersionPrefix(prefix))
+        osIds.push(`${osId}:${prefix}`);
+
+    osIds.push(osId);
 
     for (const like of GLib.get_os_info('ID_LIKE')?.split(' ') ?? []) {
         if (like)
@@ -29,7 +42,7 @@ function resolveByOsId(filename, distros) {
     for (const osId of cachedOsIds) {
         const match = distros[osId];
 
-        if (match)
+        if (match !== undefined)
             return {package: match, filename};
     }
 
@@ -115,10 +128,34 @@ export const packages = {
         }),
         '3.91': () => resolveByOsId('Vte-3.91.typelib', {
             alpine: 'vte3-gtk4',
+            'alpine:3.20': 'vte3', // https://gitlab.alpinelinux.org/alpine/aports/-/issues/17029
+            'alpine:3.21': 'vte3', // https://gitlab.alpinelinux.org/alpine/aports/-/issues/17029
             arch: 'vte4',
             debian: 'gir1.2-vte-3.91',
             fedora: 'vte291-gtk4',
             suse: 'typelib-1_0-Vte-3_91',
+        }),
+    },
+    GioUnix: {
+        '2.0': () => resolveByOsId('GioUnix-2.0.typelib', {
+            alpine: 'glib',
+            arch: 'glib2',
+            debian: 'gir1.2-glib-2.0',
+            fedora: 'glib2',
+            'opensuse-leap:15': null,
+            'sled:15': null,
+            suse: 'typelib-1_0-Gio-2_0',
+        }),
+    },
+    GLibUnix: {
+        '2.0': () => resolveByOsId('GLibUnix-2.0.typelib', {
+            alpine: 'glib',
+            arch: 'glib2',
+            debian: 'gir1.2-glib-2.0',
+            fedora: 'glib2',
+            'opensuse-leap:15': null,
+            'sled:15': null,
+            suse: 'typelib-1_0-GLibUnix-2_0',
         }),
     },
 };
