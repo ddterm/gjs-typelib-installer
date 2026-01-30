@@ -243,22 +243,20 @@ function promisify(start, finish) {
 }
 
 /**
- * Tests if PackageKit's pkcon command has a working backend.
+ * Spawn a subprocess, wait for it to terminate, and get its stdout as string.
  *
  * @async
- * @param {string} pkcon - path to the pkcon binary
+ * @param {string[]} argv - command line
  * @param {Gio.Cancellable} cancellable
- * @returns {Promise<void>}
- * @throws if the test fails
+ * @returns {Promise<string>}
  */
-async function testPkcon(pkcon, cancellable) {
+async function getSubprocessOutput(argv, cancellable = null) {
     cancellable?.set_error_if_cancelled();
 
     const launcher = Gio.SubprocessLauncher.new(Gio.SubprocessFlags.STDOUT_PIPE);
 
     launcher.setenv('LC_ALL', 'C.UTF-8', true);
 
-    const argv = [pkcon, 'backend-details'];
     const subprocess = launcher.spawnv(argv);
 
     try {
@@ -270,12 +268,7 @@ async function testPkcon(pkcon, cancellable) {
 
         await waitCheck.call(subprocess, cancellable);
 
-        // Even if `pkcon` exits with code 0, it doesn't mean it actually works...
-        if (!stdout.startsWith('Name:')) {
-            throw new Error(
-                `Unexpected output from ${shellJoin(argv)}: ${JSON.stringify(stdout)}`
-            );
-        }
+        return stdout;
     } finally {
         if (subprocess.get_identifier())
             subprocess.force_exit();
@@ -283,8 +276,93 @@ async function testPkcon(pkcon, cancellable) {
 }
 
 /**
- * Finds the command to install OS packages. Prefers PackageKit pkcon if it is
- * available.
+ * Finds the command to install OS packages using PackageKit.
+ *
+ * @async
+ * @param {Gio.Cancellable} cancellable
+ * @returns {Promise<(pkgs: string[]) => string[]>} - the function that,
+ * given the list of packages, generates the installation command
+ */
+async function findPackageKitInstallCommand(cancellable = null) {
+    cancellable?.set_error_if_cancelled();
+
+    const pkgcli = GLib.find_program_in_path('pkgcli');
+
+    if (pkgcli) {
+        const argv = [pkgcli, '--json', 'backend'];
+
+        try {
+            const stdout = await getSubprocessOutput(argv, cancellable);
+            let roles = JSON.parse(stdout).roles;
+
+            if (!Array.isArray(roles))
+                roles = `${roles}`.split(';');
+
+            if (roles.includes('install-packages')) {
+                if (roles.includes('refresh-cache')) {
+                    return pkgs => ['sh', '-c', [
+                        shellJoin([pkgcli, 'refresh']),
+                        shellJoin(['exec', pkgcli, 'install', ...pkgs]),
+                    ].join(' && ')];
+                } else {
+                    return pkgs => [pkgcli, 'install', ...pkgs];
+                }
+            } else {
+                console.warn(
+                    "%s output doesn't include 'install-packages':",
+                    shellJoin(argv),
+                    stdout
+                );
+            }
+        } catch (ex) {
+            if (ex instanceof GLib.Error &&
+                ex.matches(Gio.io_error_quark(), Gio.IOErrorEnum.CANCELLED))
+                throw ex;
+
+            console.warn("%s doesn't seem to work:", shellJoin(argv), ex);
+        }
+    }
+
+    const pkcon = GLib.find_program_in_path('pkcon');
+
+    if (pkcon) {
+        const argv = [pkcon, '--plain', 'get-roles'];
+
+        try {
+            const stdout = await getSubprocessOutput(argv, cancellable);
+            const roles = stdout.split('\n');
+
+            if (roles.includes('install-packages')) {
+                if (roles.includes('refresh-cache')) {
+                    return pkgs => ['sh', '-c', [
+                        shellJoin([pkcon, 'refresh']),
+                        shellJoin(['exec', pkcon, 'install', ...pkgs]),
+                    ].join(' && ')];
+                } else {
+                    return pkgs => [pkcon, 'install', ...pkgs];
+                }
+            } else {
+                console.warn(
+                    "%s output doesn't include 'install-packages':",
+                    shellJoin(argv),
+                    stdout
+                );
+            }
+        } catch (ex) {
+            if (ex instanceof GLib.Error &&
+                ex.matches(Gio.io_error_quark(), Gio.IOErrorEnum.CANCELLED))
+                throw ex;
+
+            console.warn("%s doesn't seem to work:", shellJoin(argv), ex);
+        }
+    }
+
+    return null;
+}
+
+/**
+ * Finds the command to install OS packages. Prefers PackageKit pkgcli/pkcon
+ * when available.
  *
  * @async
  * @param {Gio.Cancellable} cancellable
@@ -294,16 +372,10 @@ async function testPkcon(pkcon, cancellable) {
 export async function findInstallCommand(cancellable = null) {
     cancellable?.set_error_if_cancelled();
 
-    const pkcon = GLib.find_program_in_path('pkcon');
+    const packageKit = await findPackageKitInstallCommand(cancellable);
 
-    if (pkcon) {
-        try {
-            await testPkcon(pkcon, cancellable);
-            return pkgs => [pkcon, 'install', '-c', '1000', ...pkgs];
-        } catch (ex) {
-            logError(ex, `${pkcon} doesn't seem to work`);
-        }
-    }
+    if (packageKit)
+        return packageKit;
 
     const pkexec = GLib.find_program_in_path('pkexec');
 
@@ -377,7 +449,7 @@ export async function findTerminalCommand(cancellable = null) {
 }
 
 /**
- * Finds the command to install OS packages. Prefers PackageKit pkcon if it is
+ * Finds the command to install OS packages. Prefers PackageKit CLI when
  * available. Wraps the command to launch it in a terminal emulator.
  *
  * @async

@@ -2,8 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
+const allow = [
+    'org.freedesktop.packagekit.package-install',
+    'org.freedesktop.packagekit.system-sources-refresh',
+];
+
 polkit.addRule(function(action, subject) {
-    if (action.id == "org.freedesktop.packagekit.package-install") {
+    if (allow.indexOf(action.id) !== -1)
         return polkit.Result.YES;
-    }
 });
