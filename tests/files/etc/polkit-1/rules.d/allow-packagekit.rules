@@ -6,4 +6,8 @@ polkit.addRule(function(action, subject) {
     if (action.id == "org.freedesktop.packagekit.package-install") {
         return polkit.Result.YES;
     }
+
+    if (action.id == "org.freedesktop.packagekit.system-sources-refresh") {
+        return polkit.Result.YES;
+    }
 });
