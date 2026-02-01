@@ -4,7 +4,8 @@
 
 FROM docker.io/opensuse/leap:15.6 AS base
 
-RUN zypper --non-interactive install --no-recommends -f systemd gjs pkexec expect
+RUN zypper --non-interactive install --no-recommends -f systemd gjs pkexec expect && \
+	zypper clean --all
 
 COPY files /
 
@@ -20,4 +21,5 @@ CMD ["/sbin/init"]
 FROM base AS packagekit
 
 RUN zypper --non-interactive install --no-recommends -f PackageKit && \
-	rm /etc/polkit-1/rules.d/allow-pkexec.rules
+	rm /etc/polkit-1/rules.d/allow-pkexec.rules && \
+	zypper clean --all

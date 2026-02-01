@@ -4,7 +4,8 @@
 
 FROM quay.io/fedora/fedora:42 AS base
 
-RUN dnf install -y --nodocs --setopt install_weak_deps=False systemd gjs polkit expect
+RUN dnf install -y --nodocs --setopt install_weak_deps=False systemd gjs polkit expect && \
+	dnf clean all -y
 
 COPY files /
 
@@ -20,4 +21,5 @@ CMD ["/sbin/init"]
 FROM base AS packagekit
 
 RUN dnf install -y --nodocs --setopt install_weak_deps=False PackageKit && \
-	rm /etc/polkit-1/rules.d/allow-pkexec.rules
+	rm /etc/polkit-1/rules.d/allow-pkexec.rules && \
+	dnf clean all -y

@@ -4,7 +4,9 @@
 
 FROM ghcr.io/archlinux/archlinux AS base
 
-RUN pacman -Syu --noconfirm systemd gjs polkit expect
+RUN pacman -Syu --noconfirm systemd gjs polkit expect && \
+	pacman -Scc --noconfirm && \
+	rm -r /var/lib/pacman/sync/*
 
 COPY files /
 
@@ -20,4 +22,6 @@ CMD ["/sbin/init"]
 FROM base AS packagekit
 
 RUN pacman -Syu --noconfirm packagekit && \
-	rm /etc/polkit-1/rules.d/allow-pkexec.rules
+	rm /etc/polkit-1/rules.d/allow-pkexec.rules && \
+	pacman -Scc --noconfirm && \
+	rm -r /var/lib/pacman/sync/*

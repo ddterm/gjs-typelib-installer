@@ -4,7 +4,9 @@
 
 FROM docker.io/library/ubuntu:25.04 AS base
 
-RUN apt-get update && apt-get install -y --no-install-recommends systemd gjs pkexec expect
+RUN apt-get update && apt-get install -y --no-install-recommends systemd gjs pkexec expect && \
+	apt-get clean && \
+	apt-get distclean
 
 COPY files /
 
@@ -20,4 +22,6 @@ CMD ["/sbin/init"]
 FROM base AS packagekit
 
 RUN apt-get update && apt-get install -y --no-install-recommends packagekit-tools && \
-	rm /etc/polkit-1/rules.d/allow-pkexec.rules
+	rm /etc/polkit-1/rules.d/allow-pkexec.rules && \
+	apt-get clean && \
+	apt-get distclean
