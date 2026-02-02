@@ -301,7 +301,7 @@ async function findPackageKitInstallCommand(cancellable = null) {
             if (roles.includes('install-packages')) {
                 if (roles.includes('refresh-cache')) {
                     return pkgs => ['sh', '-c', [
-                        shellJoin([pkgcli, 'refresh']),
+                        shellJoin([pkgcli, 'refresh', 'force']),
                         shellJoin(['exec', pkgcli, 'install', ...pkgs]),
                     ].join(' && ')];
                 } else {
@@ -335,7 +335,7 @@ async function findPackageKitInstallCommand(cancellable = null) {
             if (roles.includes('install-packages')) {
                 if (roles.includes('refresh-cache')) {
                     return pkgs => ['sh', '-c', [
-                        shellJoin([pkcon, 'refresh']),
+                        shellJoin([pkcon, 'refresh', 'force']),
                         shellJoin(['exec', pkcon, 'install', ...pkgs]),
                     ].join(' && ')];
                 } else {
