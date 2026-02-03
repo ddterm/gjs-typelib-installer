@@ -243,3 +243,10 @@ services:
       context: tests
       dockerfile: alpine-3.23.dockerfile
       target: base
+
+  alpine-edge:
+    <<: *x-service-openrc
+    build:
+      context: tests
+      dockerfile: alpine-edge.dockerfile
+      target: base
