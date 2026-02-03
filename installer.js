@@ -300,8 +300,10 @@ async function findPackageKitInstallCommand(cancellable = null) {
 
             if (roles.includes('install-packages')) {
                 if (roles.includes('refresh-cache')) {
+                    const force = getOsIds().includes('arch');
+
                     return pkgs => ['sh', '-c', [
-                        shellJoin([pkgcli, 'refresh', 'force']),
+                        shellJoin(force ? [pkgcli, 'refresh', 'force'] : [pkgcli, 'refresh']),
                         shellJoin(['exec', pkgcli, 'install', ...pkgs]),
                     ].join(' && ')];
                 } else {
@@ -334,8 +336,10 @@ async function findPackageKitInstallCommand(cancellable = null) {
 
             if (roles.includes('install-packages')) {
                 if (roles.includes('refresh-cache')) {
+                    const force = getOsIds().includes('arch');
+
                     return pkgs => ['sh', '-c', [
-                        shellJoin([pkcon, 'refresh', 'force']),
+                        shellJoin(force ? [pkcon, 'refresh', 'force'] : [pkcon, 'refresh']),
                         shellJoin(['exec', pkcon, 'install', ...pkgs]),
                     ].join(' && ')];
                 } else {
