@@ -104,20 +104,6 @@ services:
       dockerfile: ubuntu-24.04.dockerfile
       target: packagekit
 
-  ubuntu-25.04:
-    <<: *x-service-base
-    build:
-      context: tests
-      dockerfile: ubuntu-25.04.dockerfile
-      target: base
-
-  ubuntu-25.04-packagekit:
-    <<: *x-service-packagekit
-    build:
-      context: tests
-      dockerfile: ubuntu-25.04.dockerfile
-      target: packagekit
-
   ubuntu-25.10:
     <<: *x-service-base
     build:
