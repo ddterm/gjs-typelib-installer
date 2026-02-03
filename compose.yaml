@@ -118,6 +118,20 @@ services:
       dockerfile: ubuntu-25.10.dockerfile
       target: packagekit
 
+  ubuntu-26.04:
+    <<: *x-service-base
+    build:
+      context: tests
+      dockerfile: ubuntu-26.04.dockerfile
+      target: base
+
+  ubuntu-26.04-packagekit:
+    <<: *x-service-packagekit
+    build:
+      context: tests
+      dockerfile: ubuntu-26.04.dockerfile
+      target: packagekit
+
   debian-stable:
     <<: *x-service-base
     build:
