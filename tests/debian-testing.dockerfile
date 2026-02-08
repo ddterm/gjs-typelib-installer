@@ -21,7 +21,7 @@ CMD ["/sbin/init"]
 
 FROM base AS packagekit
 
-RUN apt-get update && apt-get install -y --no-install-recommends packagekit-tools && \
+RUN apt-get update && apt-get install -y --no-install-recommends packagekit && \
 	rm /etc/polkit-1/rules.d/allow-pkexec.rules && \
 	apt-get clean && \
 	apt-get distclean
