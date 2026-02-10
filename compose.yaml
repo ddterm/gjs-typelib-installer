@@ -90,6 +90,20 @@ services:
       dockerfile: fedora-43.dockerfile
       target: packagekit
 
+  fedora-44:
+    <<: *x-service-base
+    build:
+      context: tests
+      dockerfile: fedora-44.dockerfile
+      target: base
+
+  fedora-44-packagekit:
+    <<: *x-service-packagekit
+    build:
+      context: tests
+      dockerfile: fedora-44.dockerfile
+      target: packagekit
+
   ubuntu-24.04:
     <<: *x-service-base
     build:
