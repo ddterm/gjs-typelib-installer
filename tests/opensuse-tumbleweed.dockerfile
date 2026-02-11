@@ -4,7 +4,7 @@
 
 FROM docker.io/opensuse/tumbleweed AS base
 
-RUN zypper --non-interactive install --no-recommends -f systemd gjs pkexec expect && \
+RUN zypper --non-interactive install --no-recommends -f systemd gjs pkexec expect meson && \
 	zypper clean --all
 
 COPY files /
@@ -13,7 +13,7 @@ RUN systemctl set-default multi-user.target && \
 	systemctl mask systemd-oomd low-memory-monitor rtkit-daemon udisks2 getty console-getty systemd-udev-trigger systemd-udevd && \
 	chmod u+rw /etc/shadow && \
 	truncate --size 0 /etc/machine-id && \
-	useradd -m -U -G users testuser
+	useradd -u 1001 -m -U -G users testuser
 
 STOPSIGNAL SIGRTMIN+3
 CMD ["/sbin/init"]

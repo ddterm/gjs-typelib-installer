@@ -23,6 +23,6 @@
     "scripts": {
         "lint": "eslint",
         "eslint": "eslint",
-        "test": "tests/verify.js"
+        "test": "tests/test.js"
     }
 }

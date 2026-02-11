@@ -4,7 +4,7 @@
 
 FROM docker.io/library/debian:testing AS base
 
-RUN apt-get update && apt-get install -y --no-install-recommends systemd gjs pkexec expect x11-common && \
+RUN apt-get update && apt-get install -y --no-install-recommends systemd gjs pkexec expect x11-common meson && \
 	apt-get clean && \
 	apt-get distclean
 
@@ -14,7 +14,7 @@ RUN systemctl set-default multi-user.target && \
 	systemctl mask systemd-oomd low-memory-monitor rtkit-daemon udisks2 getty console-getty systemd-udev-trigger systemd-udevd && \
 	chmod u+rw /etc/shadow && \
 	truncate --size 0 /etc/machine-id && \
-	useradd -m -U -G users testuser
+	useradd -u 1001 -m -U -G users testuser
 
 STOPSIGNAL SIGRTMIN+3
 CMD ["/sbin/init"]

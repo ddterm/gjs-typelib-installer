@@ -2,9 +2,15 @@
 #
 # SPDX-License-Identifier: MIT
 
+x-podman:
+  in_pod: false
+
 x-service-base: &x-service-base
   profiles: [base]
   tty: true
+  cgroup: private
+  user: root
+  userns_mode: keep-id:uid=1001,gid=1001
 
   cap_add:
     - SYS_ADMIN
@@ -18,9 +24,12 @@ x-service-base: &x-service-base
   volumes:
     - type: bind
       source: .
-      target: /opt/
+      target: ${PWD}
 
-  working_dir: /opt/tests
+  working_dir: ${PWD}
+
+  environment:
+    - GITHUB_ACTIONS
 
   healthcheck:
     interval: 10s

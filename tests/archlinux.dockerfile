@@ -4,7 +4,7 @@
 
 FROM ghcr.io/archlinux/archlinux AS base
 
-RUN pacman -Syu --noconfirm systemd gjs polkit expect && \
+RUN pacman -Syu --noconfirm systemd gjs polkit expect meson && \
 	pacman -Scc --noconfirm && \
 	rm -r /var/lib/pacman/sync/*
 
@@ -14,7 +14,7 @@ RUN systemctl set-default multi-user.target && \
 	systemctl mask systemd-oomd low-memory-monitor rtkit-daemon udisks2 getty console-getty systemd-udev-trigger systemd-udevd && \
 	chmod u+rw /etc/shadow && \
 	truncate --size 0 /etc/machine-id && \
-	useradd -m -U -G users testuser
+	useradd -u 1001 -m -U -G users testuser
 
 STOPSIGNAL SIGRTMIN+3
 CMD ["/sbin/init"]

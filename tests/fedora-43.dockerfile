@@ -4,7 +4,7 @@
 
 FROM quay.io/fedora/fedora:43 AS base
 
-RUN dnf install -y --nodocs --setopt install_weak_deps=False systemd gjs polkit expect && \
+RUN dnf install -y --nodocs --setopt install_weak_deps=False systemd gjs polkit expect meson && \
 	dnf clean all -y
 
 COPY files /
@@ -13,7 +13,7 @@ RUN systemctl set-default multi-user.target && \
 	systemctl mask systemd-oomd low-memory-monitor rtkit-daemon udisks2 getty console-getty systemd-udev-trigger systemd-udevd && \
 	chmod u+rw /etc/shadow && \
 	truncate --size 0 /etc/machine-id && \
-	adduser -m -U -G users testuser
+	adduser -u 1001 -m -U -G users testuser
 
 STOPSIGNAL SIGRTMIN+3
 CMD ["/sbin/init"]

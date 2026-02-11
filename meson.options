@@ -1,0 +1,50 @@
+# SPDX-FileCopyrightText: 2026 Aleksandr Mezin <mezin.alexander@gmail.com>
+#
+# SPDX-License-Identifier: MIT
+
+option(
+  'output_name',
+  type : 'string',
+  value : 'gjs-typelib-installer.js',
+  description : 'Built installer module file name',
+)
+
+option(
+  'install_dir',
+  type : 'string',
+  value : '',
+  description : 'If not empty, install the module to the specified directory'
+)
+
+option(
+  'install_tag',
+  type : 'string',
+  value : '',
+  description : 'install_tag for the built module',
+)
+
+option('tests',
+  type: 'boolean',
+  value: false,
+  description: 'Enable tests'
+)
+
+option(
+  'typelibs',
+  type : 'array',
+  choices : [
+    'Adw-1',
+    'Gdk-3.0',
+    'Gdk-4.0',
+    'Gtk-3.0',
+    'Gtk-4.0',
+    'Handy-1',
+    'cairo-1.0',
+    'Pango-1.0',
+    'Vte-2.91',
+    'Vte-3.91',
+    'GioUnix-2.0',
+    'GLibUnix-2.0',
+  ],
+  description : 'Libraries/namespaces to include, in "Namespace-version" format, for example: Gtk-3.0',
+)

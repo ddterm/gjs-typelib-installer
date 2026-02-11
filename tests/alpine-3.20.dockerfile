@@ -4,13 +4,13 @@
 
 FROM docker.io/library/alpine:3.20 AS base
 
-RUN apk add --no-cache bash openrc gjs dbus polkit expect
+RUN apk add --no-cache bash openrc gjs dbus polkit expect meson
 
 COPY files /
 
 RUN rc-update add dbus && \
 	rc-update add polkit && \
-	adduser -D -G users testuser
+	adduser -u 1001 -D -G users testuser
 
 STOPSIGNAL SIGKILL
 CMD ["/sbin/init"]

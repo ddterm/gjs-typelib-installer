@@ -52,7 +52,7 @@ jobs:
 
   test:
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 15
     needs:
       - lint
       - plan
@@ -87,11 +87,17 @@ jobs:
         env:
           SERVICE: ${{ matrix.image }}-packagekit
 
-      - run: podman exec --latest -u testuser ./sequence.sh
+      - run: podman exec --latest -u testuser tests/e2e-tests.sh
         if: ${{ !cancelled() && steps.packagekit-up.outcome == 'success' }}
 
       - run: podman compose --profile packagekit down
         if: ${{ !cancelled() && steps.packagekit-up.outcome != 'skipped' }}
+
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        if: ${{ always() && steps.packagekit-up.outcome == 'success' }}
+        with:
+          name: ${{ matrix.image }}-packagekit
+          path: build/meson-logs
 
       - id: base-up
         if: ${{ !cancelled() && steps.base.outcome == 'success' }}
@@ -101,8 +107,14 @@ jobs:
         env:
           SERVICE: ${{ matrix.image }}
 
-      - run: podman exec --latest -u testuser ./sequence.sh
+      - run: podman exec --latest -u testuser tests/e2e-tests.sh
         if: ${{ !cancelled() && steps.base-up.outcome == 'success' }}
 
       - run: podman compose --profile base down
         if: ${{ !cancelled() && steps.base-up.outcome != 'skipped' }}
+
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        if: ${{ always() && steps.base-up.outcome == 'success' }}
+        with:
+          name: ${{ matrix.image }}
+          path: build/meson-logs

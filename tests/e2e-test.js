@@ -7,15 +7,29 @@
 const {GLib, Gio, GIRepository} = imports.gi;
 const System = imports.system;
 
-async function main() {
-    const installer = await import(System.programArgs[0]);
+const GNU_SKIP_RETURNCODE = 77;
+const GNU_ERROR_RETURNCODE = 99;
+
+async function main(options) {
+    const srcPath =
+        GLib.canonicalize_filename(options.lookup('input', 's') ?? 'installer.js', null);
+
+    const installer = await import(GLib.filename_to_uri(srcPath, null));
+    const typelibs = options.lookup(GLib.OPTION_REMAINING, 'as', true);
     const versions = {};
 
-    for (const arg of System.programArgs.slice(1)) {
-        const [namespace, version, ...extra] = arg.split('=');
+    if (!typelibs) {
+        printerr('No namespaces/libraries specified');
+        return GNU_SKIP_RETURNCODE;
+    }
 
-        if (!version || extra.length)
-            throw new Error(`Invalid argument ${arg}: should be in namespace=version format`);
+    for (const arg of typelibs) {
+        const [namespace, version, ...extra] = arg.split('-');
+
+        if (!version || extra.length) {
+            printerr(`Invalid argument ${arg}: should be in "Namespace-version" format, for example: Gtk-3.0`);
+            return GNU_ERROR_RETURNCODE;
+        }
 
         versions[namespace] = version;
     }
@@ -66,14 +80,47 @@ async function main() {
             );
         }
     }
+
+    return 0;
 }
 
-const loop = GLib.MainLoop.new(null, false);
+GLib.set_prgname(System.programInvocationName);
 
-loop.runAsync();
+const app = new Gio.Application();
 
-main().then(() => loop.quit(), error => {
-    loop.quit();
-    logError(error);
-    System.exit(1);
+app.add_main_option(
+    'input',
+    'i'.charCodeAt(0),
+    GLib.OptionFlags.NONE,
+    GLib.OptionArg.STRING,
+    'Source code file (installer.js). Will read installer.js from the current directory if not specified.',
+    'installer.js'
+);
+
+app.add_main_option(
+    GLib.OPTION_REMAINING,
+    0,
+    GLib.OptionFlags.NONE,
+    GLib.OptionArg.STRING_ARRAY,
+    'Libraries/namespaces to include, in "Namespace-version" format, for example: Gtk-3.0',
+    null
+);
+
+app.set_option_context_parameter_string('-- Namespace-version Namespace-version…');
+
+app.connect('handle-local-options', (_, options) => {
+    app.hold();
+
+    main(options).catch(error => {
+        logError(error);
+        return 1;
+    }).then(exitCode => {
+        app.release();
+        System.exit(exitCode);
+    });
+
+    return -1;
 });
+
+app.connect('activate', () => {});
+app.run([System.programInvocationName, ...System.programArgs]);
