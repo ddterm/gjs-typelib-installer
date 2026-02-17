@@ -68,7 +68,7 @@ jobs:
       - run: systemctl --user enable --now podman.socket
 
       - id: packagekit-up
-        if: contains(needs.plan.outputs.packagekit-services, env.SERVICE)
+        if: contains(fromJSON(needs.plan.outputs.packagekit-services), env.SERVICE)
         run: podman compose up --build --wait "$SERVICE"
         env:
           SERVICE: ${{ matrix.image }}-packagekit
