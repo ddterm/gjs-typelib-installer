@@ -148,10 +148,16 @@ async function main(options) {
 
     const installer = await import(GLib.filename_to_uri(srcPath, null));
     const report = new Report();
+    const typelibFilter = options.lookup(GLib.OPTION_REMAINING, 'as', true);
 
     for (const [namespace, versions] of Object.entries(installer.packages)) {
         for (const [version, resolveFunc] of Object.entries(versions)) {
             const name = `${namespace}-${version}`;
+
+            if (typelibFilter && !typelibFilter.includes(name)) {
+                report.skip(`${name}: not matching command line args`);
+                continue;
+            }
 
             try {
                 test(report, name, resolveFunc);
@@ -188,6 +194,17 @@ app.add_main_option(
     'Exit with code 0 even if some tests failed. Exit with non-zero code only for fatal errors.',
     null
 );
+
+app.add_main_option(
+    GLib.OPTION_REMAINING,
+    0,
+    GLib.OptionFlags.NONE,
+    GLib.OptionArg.STRING_ARRAY,
+    'Libraries/namespaces to check, in "Namespace-version" format, for example: Gtk-3.0. Check all if not specified.',
+    null
+);
+
+app.set_option_context_parameter_string('-- [Namespace-version…]');
 
 app.connect('handle-local-options', (_, options) => {
     app.hold();
