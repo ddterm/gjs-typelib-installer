@@ -67,23 +67,9 @@ jobs:
 
       - run: systemctl --user enable --now podman.socket
 
-      - id: packagekit
-        run: podman compose build "$SERVICE"
-        if: contains(needs.plan.outputs.packagekit-services, env.SERVICE)
-        env:
-          SERVICE: ${{ matrix.image }}-packagekit
-
-      - id: base
-        run: podman compose build "$SERVICE"
-        if: ${{ !cancelled() }}
-        env:
-          SERVICE: ${{ matrix.image }}
-
       - id: packagekit-up
-        if: ${{ !cancelled() && steps.packagekit.outcome == 'success' }}
-        run: |
-          podman compose up -d "$SERVICE"
-          podman wait --latest --condition=healthy
+        if: contains(needs.plan.outputs.packagekit-services, env.SERVICE)
+        run: podman compose up --build --wait "$SERVICE"
         env:
           SERVICE: ${{ matrix.image }}-packagekit
 
@@ -100,10 +86,8 @@ jobs:
           path: build/meson-logs
 
       - id: base-up
-        if: ${{ !cancelled() && steps.base.outcome == 'success' }}
-        run: |
-          podman compose up -d "$SERVICE"
-          podman wait --latest --condition=healthy
+        if: ${{ !cancelled() }}
+        run: podman compose up --build --wait "$SERVICE"
         env:
           SERVICE: ${{ matrix.image }}
 
