@@ -43,7 +43,7 @@ doconfigure() {
 }
 
 dotest() {
-    dorun meson test -C "${BUILD_DIR#"$PWD/"}" --no-rebuild --print-errorlogs --wrapper "$SCRIPT_DIR/yes.expect" --logbase "$(printf '%s-' "$@")" --test-args "$(printf '%q ' "$@")" e2e-test
+    dorun meson test -C "${BUILD_DIR#"$PWD/"}" --no-rebuild --print-errorlogs --logbase "$(printf '%s-' "$@")" --test-args "$(printf '%q ' "$@")" e2e-test
 }
 
 . /etc/os-release

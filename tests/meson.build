@@ -9,9 +9,11 @@ test(
   protocol: 'tap',
 )
 
+expect = find_program('expect', required: false, disabler: true)
+
 test(
   'e2e-test',
-  gjs,
-  args: [files('e2e-test.js'), '--input', output, '--'],
+  expect,
+  args: ['-f', files('yes.expect'), gjs.full_path(), files('e2e-test.js'), '--input', output],
   timeout: 120,
 )
