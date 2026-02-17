@@ -79,12 +79,6 @@ jobs:
       - run: podman compose --profile packagekit down
         if: ${{ !cancelled() && steps.packagekit-up.outcome != 'skipped' }}
 
-      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
-        if: ${{ always() && steps.packagekit-up.outcome == 'success' }}
-        with:
-          name: ${{ matrix.image }}-packagekit
-          path: build/meson-logs
-
       - id: base-up
         if: ${{ !cancelled() }}
         run: podman compose up --build --wait "$SERVICE"
@@ -98,7 +92,7 @@ jobs:
         if: ${{ !cancelled() && steps.base-up.outcome != 'skipped' }}
 
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
-        if: ${{ always() && steps.base-up.outcome == 'success' }}
+        if: ${{ always() }}
         with:
           name: ${{ matrix.image }}
-          path: build/meson-logs
+          path: tests/build-*/meson-logs

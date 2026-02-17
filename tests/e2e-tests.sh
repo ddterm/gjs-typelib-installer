@@ -6,7 +6,7 @@
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 SRC_DIR="$(dirname -- "$SCRIPT_DIR")"
-BUILD_DIR="$SRC_DIR/build"
+BUILD_DIR="${BUILD_DIR:-$SRC_DIR/build}"
 
 if [ "$(id -un)" != testuser ]; then
     echo 'Tests should be run in a podman compose container, as user "testuser"'
