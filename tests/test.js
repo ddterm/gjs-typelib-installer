@@ -7,6 +7,66 @@
 const {GLib, Gio} = imports.gi;
 const System = imports.system;
 
+class Report {
+    static escape(str, allowLineBreaks = true) {
+        const escaped = String(str).replace(/\\|#/g, '\\$&');
+
+        if (allowLineBreaks)
+            return escaped.replace(/\n/g, '\n# ');
+        else if (escaped.includes('\n'))
+            throw new Error('Line breaks not allowed here!');
+
+        return escaped;
+    }
+
+    #test_point_id = 0;
+    #failed = false;
+
+    constructor() {
+        print('TAP version', 13);
+    }
+
+    end() {
+        print(`1..${this.#test_point_id}`);
+
+        return this.#failed ? 1 : 0;
+    }
+
+    #next_test() {
+        this.#test_point_id += 1;
+
+        return this.#test_point_id;
+    }
+
+    ok(description) {
+        print('ok', this.#next_test(), '-', Report.escape(description));
+    }
+
+    skip(description) {
+        print('ok', this.#next_test(), '-', Report.escape(description, false), '# SKIP');
+    }
+
+    notOk(description) {
+        this.#failed = true;
+
+        print('not ok', this.#next_test(), '-', Report.escape(description));
+
+        if (description instanceof Error)
+            Report.comment(description.stack);
+    }
+
+    static comment(text) {
+        print('#', Report.escape(text));
+    }
+
+    static bailOut(reason) {
+        print('Bail out!', Report.escape(reason));
+
+        if (reason instanceof Error)
+            Report.comment(reason.stack);
+    }
+}
+
 function listFilesCommand() {
     let osIds = [GLib.get_os_info('ID')];
 
@@ -39,34 +99,28 @@ function listFiles(packageName) {
     const command = listFilesCommand();
     const spawnFlags = GLib.SpawnFlags.SEARCH_PATH | GLib.SpawnFlags.CHILD_INHERITS_STDERR;
     const resolvedCommand = command(packageName);
+    const commandLine = resolvedCommand.map(arg => GLib.shell_quote(arg)).join(' ');
 
-    print('#', tapEscape(resolvedCommand.map(arg => GLib.shell_quote(arg)).join(' ')));
+    Report.comment(commandLine);
 
     const [, stdout, , waitStatus] = GLib.spawn_sync(null, resolvedCommand, null, spawnFlags, null);
 
     try {
         GLib.spawn_check_wait_status(waitStatus);
     } catch (error) {
-        print('#', new TextDecoder().decode(stdout).replace('\n', '#'));
-        throw error;
+        Report.comment(new TextDecoder().decode(stdout));
+
+        throw new Error(`${commandLine}: ${error}`, {cause: error});
     }
 
-    return new TextDecoder().decode(stdout).split(/\n/).filter(v => v !== '');
+    return new TextDecoder().decode(stdout).split('\n').filter(Boolean);
 }
 
-function tapEscape(str) {
-    return str.replace(/\\|#/g, '\\$&');
-}
-
-function test(n, name, resolveFunc) {
-    print('#', n, '-', name);
-
+function test(report, name, resolveFunc) {
     const {packages, filename} = resolveFunc();
 
     if (!packages) {
-        const description = tapEscape(`skipping ${JSON.stringify(filename)} - no known package`);
-
-        print('ok', n, '-', name, '#', 'SKIP', description);
+        report.skip(`${name}: ${JSON.stringify(filename)} - no known package`);
         return;
     }
 
@@ -75,11 +129,10 @@ function test(n, name, resolveFunc) {
         const fileNames = files.map(p => GLib.path_get_basename(p));
 
         if (fileNames.includes(filename)) {
-            const description = tapEscape(
-                `package ${JSON.stringify(packageName)} provides file ${JSON.stringify(filename)}`
+            report.ok(
+                `${name}: package ${JSON.stringify(packageName)} provides file ${JSON.stringify(filename)}`
             );
 
-            print('ok', n, '-', name, ':', description);
             return;
         }
     }
@@ -94,27 +147,24 @@ async function main(options) {
         GLib.canonicalize_filename(options.lookup('input', 's') ?? 'installer.js', null);
 
     const installer = await import(GLib.filename_to_uri(srcPath, null));
-    let n = 0;
-    let fail = false;
+    const report = new Report();
 
     for (const [namespace, versions] of Object.entries(installer.packages)) {
         for (const [version, resolveFunc] of Object.entries(versions)) {
-            n += 1;
-
-            const name = tapEscape(`${namespace}-${version}`);
+            const name = `${namespace}-${version}`;
 
             try {
-                test(n, name, resolveFunc);
+                test(report, name, resolveFunc);
             } catch (error) {
-                fail = true;
-                print('not ok', n, '-', name, ':', tapEscape(String(error)));
+                report.notOk(`${name}: ${String(error)}`);
+                Report.comment(error.stack);
             }
         }
     }
 
-    print(`1..${n}`);
+    const exitCode = report.end();
 
-    return fail ? 1 : 0;
+    return options.lookup('no-exit-code', 'b') ? 0 : exitCode;
 }
 
 GLib.set_prgname(System.programInvocationName);
@@ -130,12 +180,20 @@ app.add_main_option(
     'installer.js'
 );
 
+app.add_main_option(
+    'no-exit-code',
+    0,
+    GLib.OptionFlags.NONE,
+    GLib.OptionArg.NONE,
+    'Exit with code 0 even if some tests failed. Exit with non-zero code only for fatal errors.',
+    null
+);
+
 app.connect('handle-local-options', (_, options) => {
     app.hold();
 
     main(options).catch(error => {
-        print('Bail out!', tapEscape(String(error)));
-        logError(error);
+        Report.bailOut(error);
         return 1;
     }).then(exitCode => {
         app.release();

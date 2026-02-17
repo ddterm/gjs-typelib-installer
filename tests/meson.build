@@ -5,7 +5,7 @@
 test(
   'test',
   gjs,
-  args: [files('test.js'), '--input', output],
+  args: [files('test.js'), '--no-exit-code', '--input', output],
   protocol: 'tap',
 )
 
