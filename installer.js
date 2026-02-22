@@ -213,8 +213,13 @@ export function require(versions) {
     for (const [namespace, version] of Object.entries(versions)) {
         const resolver = packages[namespace]?.[version];
 
-        if (!resolver)
-            throw new Error(`No definition for namespace ${namespace}, version ${version}`);
+        if (!resolver) {
+            throw new Error([
+                `No definition for namespace ${namespace}, version ${version} found.`,
+                'If you use gjs-typelib-installer as Meson subproject,',
+                'try removing the build directory and restarting the build from scratch',
+            ].join(' '));
+        }
 
         try {
             found[namespace] = Gi.require(namespace, version);
