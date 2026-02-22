@@ -45,6 +45,7 @@ option(
     'Vte-3.91',
     'GioUnix-2.0',
     'GLibUnix-2.0',
+    'Template-1.0',
   ],
   description : 'Libraries/namespaces to include, in "Namespace-version" format, for example: Gtk-3.0',
 )

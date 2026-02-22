@@ -157,6 +157,16 @@ export const packages = {
             suse: ['typelib-1_0-GLibUnix-2_0'],
         }),
     },
+    Template: {
+        '1.0': () => resolveByOsId('Template-1.0.typelib', {
+            alpine: ['template-glib'],
+            arch: ['template-glib'],
+            debian: ['gir1.2-template-1.0'],
+            fedora: ['template-glib'],
+            rhel: null,
+            suse: ['typelib-1_0-Template-1_0'],
+        }),
+    },
 };
 
 export class MissingDependencies extends Error {

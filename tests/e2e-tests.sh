@@ -57,6 +57,8 @@ alpine-3.20.* | alpine-3.21.*)
 	VTE4_WRONG_PACKAGE=1;;&  # https://gitlab.alpinelinux.org/alpine/aports/-/issues/17029
 opensuse-tumbleweed-* | opensuse-leap-16.0)
 	SEPARATE_GLIBUNIX=1;;&
+centos-* | rhel-* | almalinux-*)
+	SKIP_TEMPLATE=1;;&  # Not available on RHEL/CentOS
 esac
 
 set -e
@@ -88,6 +90,10 @@ else
 	dotest Vte-2.91
 	dotest Vte-3.91
 fi
+
+doconfigure '-Dtypelibs=["Template-1.0"]'
+
+[ "$SKIP_TEMPLATE" = "1" ] || dotest Template-1.0
 
 # reset options, keep test logs
 dorun rm -rvf "${BUILD_DIR#"$PWD/"}/"{meson-private,meson-info}
