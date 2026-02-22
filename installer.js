@@ -35,11 +35,15 @@ function getOsIds() {
 
 let cachedOsIds;
 
-function resolveByOsId(filename, distros) {
+function getOsIdsCached() {
     if (!cachedOsIds)
         cachedOsIds = getOsIds();
 
-    for (const osId of cachedOsIds) {
+    return cachedOsIds;
+}
+
+function resolveByOsId(filename, distros) {
+    for (const osId of getOsIdsCached()) {
         const packages = distros[osId];
 
         if (packages !== undefined)
@@ -392,7 +396,7 @@ export async function findInstallCommand(cancellable = null) {
     if (!pkexec)
         return null;
 
-    for (const os of getOsIds()) {
+    for (const os of getOsIdsCached()) {
         if (os === 'alpine') {
             const apk = GLib.find_program_in_path('apk');
 
