@@ -9,6 +9,9 @@ project(
   license_files: 'LICENSE',
 )
 
+license = files('LICENSE')
+license_reuse = files('LICENSES' / 'MIT.txt')
+
 source = files('installer.js')
 build_script = files('build.js')
 gjs = find_program('gjs')
