@@ -12,7 +12,7 @@ project(
 license = files('LICENSE')
 license_reuse = files('LICENSES' / 'MIT.txt')
 
-source = files('installer.js')
+source = files('gjs-typelib-installer.js')
 build_script = files('build.js')
 gjs = find_program('gjs')
 build_command = [gjs, build_script, '--input', '@INPUT@', '--output', '@OUTPUT@', '--']

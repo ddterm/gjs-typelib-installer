@@ -143,8 +143,10 @@ function test(report, name, resolveFunc) {
 }
 
 async function main(options) {
-    const srcPath =
-        GLib.canonicalize_filename(options.lookup('input', 's') ?? 'installer.js', null);
+    const srcPath = GLib.canonicalize_filename(
+        options.lookup('input', 's') ?? 'gjs-typelib-installer.js',
+        null
+    );
 
     const installer = await import(GLib.filename_to_uri(srcPath, null));
     const report = new Report();
@@ -182,8 +184,8 @@ app.add_main_option(
     'i'.charCodeAt(0),
     GLib.OptionFlags.NONE,
     GLib.OptionArg.STRING,
-    'Source code file (installer.js). Will read installer.js from the current directory if not specified.',
-    'installer.js'
+    'Source code file (gjs-typelib-installer.js). Will read gjs-typelib-installer.js from the current directory if not specified.',
+    'gjs-typelib-installer.js'
 );
 
 app.add_main_option(
