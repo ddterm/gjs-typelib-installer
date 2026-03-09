@@ -4,7 +4,8 @@
 
 FROM quay.io/fedora/fedora:44 AS base
 
-RUN dnf install -y --nodocs --setopt install_weak_deps=False systemd gjs polkit expect meson && \
+RUN dnf config-manager setopt updates-testing.enabled=false && \
+	dnf install -y --nodocs --setopt install_weak_deps=False systemd gjs polkit expect meson && \
 	dnf clean all -y
 
 COPY files /
