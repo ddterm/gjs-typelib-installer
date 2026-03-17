@@ -3,12 +3,16 @@
 // SPDX-License-Identifier: MIT
 
 import {defineConfig} from '@eslint/config-helpers';
+import jsdoc from 'eslint-plugin-jsdoc';
+import tseslint from 'typescript-eslint';
+// @ts-ignore
 import gnome from 'eslint-config-gnome';
 
 export default defineConfig([
-    gnome.configs.recommended,
-    gnome.configs.jsdoc,
     {
+        files: ['*.js', '*.mjs', 'tests/*.js'],
+        plugins: {gnome},
+        extends: ['gnome/recommended'],
         rules: {
             camelcase: ['error', {
                 properties: 'never',
@@ -21,13 +25,62 @@ export default defineConfig([
                 afterColon: true,
             }],
             'prefer-arrow-callback': 'error',
-            'jsdoc/require-param-description': 'off',
-            'jsdoc/require-jsdoc': ['error', {
-                exemptEmptyFunctions: true,
-                publicOnly: {
-                    esm: true,
-                },
+        },
+    },
+    {
+        files: [
+            'ambient.d.ts',
+            'gjs-typelib-installer.js',
+            'tests/test.js',
+            'tests/e2e-test.js',
+        ],
+        plugins: {jsdoc, tseslint},
+        extends: [
+            'tseslint/strictTypeChecked',
+            'tseslint/stylisticTypeChecked',
+            'jsdoc/flat/recommended-typescript-flavor-error',
+        ],
+        rules: {
+            'no-extra-parens': ['error', 'all', {
+                conditionalAssign: false,
+                nestedBinaryExpressions: false,
+                returnAssign: false,
+                allowParensAfterCommentPattern: '@type',
             }],
+            'jsdoc/tag-lines': ['error', 'always', {
+                startLines: 1,
+                count: 0,
+            }],
+        },
+        languageOptions: {
+            parserOptions: {
+                projectService: true,
+            },
+        },
+    },
+    {
+        files: [
+            'tests/*.js',
+        ],
+        plugins: {jsdoc},
+        rules: {
+            'jsdoc/require-param-description': 'off',
+            'jsdoc/require-returns': 'off',
+            'jsdoc/require-returns-description': 'off',
+        },
+    },
+    {
+        files: [
+            'gjs-typelib-installer.js',
+        ],
+        plugins: {jsdoc},
+        rules: {
+            'jsdoc/require-description': ['error', {
+                exemptedBy: ['inheritdoc', 'private'],
+            }],
+            'jsdoc/require-description-complete-sentence': 'error',
+            'jsdoc/require-hyphen-before-param-description': 'error',
+            'jsdoc/require-asterisk-prefix': 'error',
         },
     },
 ]);

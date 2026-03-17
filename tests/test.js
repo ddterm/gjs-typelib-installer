@@ -1,13 +1,20 @@
-#!/usr/bin/env gjs
+#!/usr/bin/env -S gjs -m
 
 // SPDX-FileCopyrightText: 2025 Aleksandr Mezin <mezin.alexander@gmail.com>
 //
 // SPDX-License-Identifier: MIT
 
-const {GLib, Gio} = imports.gi;
-const System = imports.system;
+import GLib from 'gi://GLib';
+import Gio from 'gi://Gio';
+
+import System from 'system';
 
 class Report {
+    /**
+     * @param {string|Error} str
+     * @param {boolean} allowLineBreaks
+     * @returns {string}
+     */
     static escape(str, allowLineBreaks = true) {
         const escaped = String(str).replace(/\\|#/g, '\\$&');
 
@@ -27,6 +34,7 @@ class Report {
     }
 
     end() {
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         print(`1..${this.#test_point_id}`);
 
         return this.#failed ? 1 : 0;
@@ -38,35 +46,53 @@ class Report {
         return this.#test_point_id;
     }
 
+    /**
+     * @param {string} description
+     */
     ok(description) {
         print('ok', this.#next_test(), '-', Report.escape(description));
     }
 
+    /**
+     * @param {string} description
+     */
     skip(description) {
         print('ok', this.#next_test(), '-', Report.escape(description, false), '# SKIP');
     }
 
+    /**
+     * @param {string|Error} description
+     */
     notOk(description) {
         this.#failed = true;
 
         print('not ok', this.#next_test(), '-', Report.escape(description));
 
-        if (description instanceof Error)
+        if (description instanceof Error && description.stack)
             Report.comment(description.stack);
     }
 
+    /**
+     * @param {string} text
+     */
     static comment(text) {
         print('#', Report.escape(text));
     }
 
+    /**
+     * @param {string|Error} reason
+     */
     static bailOut(reason) {
         print('Bail out!', Report.escape(reason));
 
-        if (reason instanceof Error)
+        if (reason instanceof Error && reason.stack)
             Report.comment(reason.stack);
     }
 }
 
+/**
+ * @returns {(packageName: string) => string[]}
+ */
 function listFilesCommand() {
     let osIds = [GLib.get_os_info('ID')];
 
@@ -92,9 +118,13 @@ function listFilesCommand() {
             return packageName => ['rpm', '-ql', '--whatprovides', packageName];
     }
 
-    return null;
+    throw new Error(`No command for listing package files found. OS ids: ${JSON.stringify(osIds)}`);
 }
 
+/**
+ * @param {string} packageName
+ * @returns {string[]}
+ */
 function listFiles(packageName) {
     const command = listFilesCommand();
     const spawnFlags = GLib.SpawnFlags.SEARCH_PATH | GLib.SpawnFlags.CHILD_INHERITS_STDERR;
@@ -108,15 +138,28 @@ function listFiles(packageName) {
     try {
         GLib.spawn_check_wait_status(waitStatus);
     } catch (error) {
-        Report.comment(new TextDecoder().decode(stdout));
+        if (stdout)
+            Report.comment(new TextDecoder().decode(stdout));
 
-        throw new Error(`${commandLine}: ${error}`, {cause: error});
+        throw new Error(`${commandLine}: ${String(error)}`, {cause: error});
     }
+
+    if (!stdout)
+        return [];
 
     return new TextDecoder().decode(stdout).split('\n').filter(Boolean);
 }
 
+/**
+ * @param {Report} report
+ * @param {string} name
+ * @param {(() => {packages?: string[]|null, filename: string})|undefined} resolveFunc
+ */
 function test(report, name, resolveFunc) {
+    if (!resolveFunc)
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        throw new Error(`${name}: resolveFunc is ${resolveFunc}`);
+
     const {packages, filename} = resolveFunc();
 
     if (!packages) {
@@ -142,17 +185,30 @@ function test(report, name, resolveFunc) {
     );
 }
 
+/**
+ * @param {GLib.VariantDict} options
+ */
 async function main(options) {
     const srcPath = GLib.canonicalize_filename(
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         options.lookup('input', 's') ?? 'gjs-typelib-installer.js',
         null
     );
 
+    /** @type {typeof import('../gjs-typelib-installer.js')} */
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const installer = await import(GLib.filename_to_uri(srcPath, null));
+
     const report = new Report();
+
+    /** @type {string[]|null} */
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const typelibFilter = options.lookup(GLib.OPTION_REMAINING, 'as', true);
 
     for (const [namespace, versions] of Object.entries(installer.packages)) {
+        if (!versions)
+            continue;
+
         for (const [version, resolveFunc] of Object.entries(versions)) {
             const name = `${namespace}-${version}`;
 
@@ -165,7 +221,9 @@ async function main(options) {
                 test(report, name, resolveFunc);
             } catch (error) {
                 report.notOk(`${name}: ${String(error)}`);
-                Report.comment(error.stack);
+
+                if (error instanceof Error && error.stack)
+                    Report.comment(error.stack);
             }
         }
     }
@@ -211,8 +269,8 @@ app.set_option_context_parameter_string('-- [Namespace-version…]');
 app.connect('handle-local-options', (_, options) => {
     app.hold();
 
-    main(options).catch(error => {
-        Report.bailOut(error);
+    void main(options).catch(/** @param {unknown} error */ error => {
+        logError(error);
         return 1;
     }).then(exitCode => {
         app.release();
@@ -222,5 +280,5 @@ app.connect('handle-local-options', (_, options) => {
     return -1;
 });
 
-app.connect('activate', () => {});
-app.run([System.programInvocationName, ...System.programArgs]);
+app.connect('activate', () => { /* promise started from handle-local-options */ });
+void app.runAsync([System.programInvocationName, ...System.programArgs]);

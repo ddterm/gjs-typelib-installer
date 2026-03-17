@@ -5,7 +5,7 @@
 test(
   'test',
   gjs,
-  args: [files('test.js'), '--no-exit-code', '--input', output],
+  args: ['-m', files('test.js'), '--no-exit-code', '--input', output],
   protocol: 'tap',
 )
 
@@ -14,6 +14,6 @@ expect = find_program('expect', required: false, disabler: true)
 test(
   'e2e-test',
   expect,
-  args: ['-f', files('yes.expect'), gjs.full_path(), files('e2e-test.js'), '--input', output],
+  args: ['-f', files('yes.expect'), gjs.full_path(), '-m', files('e2e-test.js'), '--input', output],
   timeout: 120,
 )
