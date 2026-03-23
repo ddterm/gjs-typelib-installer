@@ -186,24 +186,16 @@ function test(report, name, resolveFunc) {
 }
 
 /**
- * @param {GLib.VariantDict} options
+ * @param {string} srcPath
+ * @param {string[]|null} typelibFilter
+ * @param {boolean} noExitCode
  */
-async function main(options) {
-    const srcPath = GLib.canonicalize_filename(
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        options.lookup('input', 's') ?? 'gjs-typelib-installer.js',
-        null
-    );
-
+async function main(srcPath, typelibFilter, noExitCode) {
     /** @type {typeof import('../gjs-typelib-installer.js')} */
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const installer = await import(GLib.filename_to_uri(srcPath, null));
 
     const report = new Report();
-
-    /** @type {string[]|null} */
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const typelibFilter = options.lookup(GLib.OPTION_REMAINING, 'as', true);
 
     for (const [namespace, versions] of Object.entries(installer.packages)) {
         if (!versions)
@@ -230,7 +222,7 @@ async function main(options) {
 
     const exitCode = report.end();
 
-    return options.lookup('no-exit-code', 'b') ? 0 : exitCode;
+    return noExitCode ? 0 : exitCode;
 }
 
 GLib.set_prgname(System.programInvocationName);
@@ -267,9 +259,23 @@ app.add_main_option(
 app.set_option_context_parameter_string('-- [Namespace-version…]');
 
 app.connect('handle-local-options', (_, options) => {
+    const srcPath = GLib.canonicalize_filename(
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        options.lookup('input', 's') ?? 'gjs-typelib-installer.js',
+        null
+    );
+
+    /** @type {boolean} */
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const noExitCode = options.lookup('no-exit-code', 'b');
+
+    /** @type {string[]|null} */
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const typelibFilter = options.lookup(GLib.OPTION_REMAINING, 'as', true);
+
     app.hold();
 
-    void main(options).catch(/** @param {unknown} error */ error => {
+    void main(srcPath, typelibFilter, noExitCode).catch(/** @param {unknown} error */ error => {
         logError(error);
         return 1;
     }).then(exitCode => {

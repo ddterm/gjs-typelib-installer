@@ -7,20 +7,7 @@
 const {GLib, Gio} = imports.gi;
 const System = imports.system;
 
-async function main(options) {
-    const srcPath = GLib.canonicalize_filename(
-        options.lookup('input', 's') ?? 'gjs-typelib-installer.js',
-        null
-    );
-
-    const outputPath = options.lookup('output', 's');
-    const typelibs = options.lookup(GLib.OPTION_REMAINING, 'as', true);
-
-    if (!typelibs) {
-        printerr('No namespaces/libraries specified');
-        return 1;
-    }
-
+async function main(srcPath, outputPath, typelibs) {
     const {packages} = await import(GLib.filename_to_uri(srcPath, null));
     const includeNamespaces = {};
 
@@ -103,9 +90,22 @@ app.add_main_option(
 app.set_option_context_parameter_string('-- Namespace-version Namespace-version…');
 
 app.connect('handle-local-options', (_, options) => {
+    const srcPath = GLib.canonicalize_filename(
+        options.lookup('input', 's') ?? 'gjs-typelib-installer.js',
+        null
+    );
+
+    const outputPath = options.lookup('output', 's');
+    const typelibs = options.lookup(GLib.OPTION_REMAINING, 'as', true);
+
+    if (!typelibs) {
+        printerr('No namespaces/libraries specified');
+        return 1;
+    }
+
     app.hold();
 
-    main(options).catch(error => {
+    main(srcPath, outputPath, typelibs).catch(error => {
         logError(error);
         return 1;
     }).then(exitCode => {

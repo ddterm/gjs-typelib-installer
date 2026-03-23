@@ -15,30 +15,16 @@ const GNU_SKIP_RETURNCODE = 77;
 const GNU_ERROR_RETURNCODE = 99;
 
 /**
- * @param {GLib.VariantDict} options
+ * @param {string} srcPath
+ * @param {string[]} typelibs
  */
-async function main(options) {
-    const srcPath = GLib.canonicalize_filename(
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        options.lookup('input', 's') ?? 'gjs-typelib-installer.js',
-        null
-    );
-
+async function main(srcPath, typelibs) {
     /** @type {import('../gjs-typelib-installer.js')} */
     /* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */
     const installer = await import(GLib.filename_to_uri(srcPath, null));
 
-    /** @type {string[]|null} */
-    /* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */
-    const typelibs = options.lookup(GLib.OPTION_REMAINING, 'as', true);
-
     /** @type {Record<string, string>} */
     const versions = {};
-
-    if (!typelibs) {
-        printerr('No namespaces/libraries specified');
-        return GNU_SKIP_RETURNCODE;
-    }
 
     for (const arg of typelibs) {
         const [namespace, version, ...extra] = arg.split('-');
@@ -135,9 +121,24 @@ app.add_main_option(
 app.set_option_context_parameter_string('-- Namespace-version Namespace-version…');
 
 app.connect('handle-local-options', (_, options) => {
+    const srcPath = GLib.canonicalize_filename(
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        options.lookup('input', 's') ?? 'gjs-typelib-installer.js',
+        null
+    );
+
+    /** @type {string[]|null} */
+    /* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */
+    const typelibs = options.lookup(GLib.OPTION_REMAINING, 'as', true);
+
+    if (!typelibs) {
+        printerr('No namespaces/libraries specified');
+        return GNU_SKIP_RETURNCODE;
+    }
+
     app.hold();
 
-    void main(options).catch(/** @param {unknown} error */ error => {
+    void main(srcPath, typelibs).catch(/** @param {unknown} error */ error => {
         logError(error);
         return 1;
     }).then(exitCode => {
