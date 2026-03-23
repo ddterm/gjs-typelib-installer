@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {defineConfig} from '@eslint/config-helpers';
+import {defineConfig} from 'eslint/config';
 import jsdoc from 'eslint-plugin-jsdoc';
 import tseslint from 'typescript-eslint';
 // @ts-ignore
