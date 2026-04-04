@@ -23,7 +23,7 @@
         "eslint-config-gnome": "git+https://gitlab.gnome.org/World/javascript/eslint-config-gnome.git#c479d059e8d9ea99c3b53c2ea43abf7fdb05eb51",
         "eslint-plugin-jsdoc": "62.8.0",
         "jsdoc": "4.0.5",
-        "typescript": "5.9.3",
+        "typescript": "6.0.2",
         "typescript-eslint": "8.58.0"
     },
     "scripts": {
