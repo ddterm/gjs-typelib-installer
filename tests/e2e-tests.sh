@@ -55,7 +55,7 @@ alpine-3.20.* | alpine-3.21.* | alpine-3.22.* | fedora-* | centos-10 | opensuse-
 	SKIP_FREEDESKTOP=1;;&  # cairo and other are dependencies of gjs
 alpine-3.20.* | alpine-3.21.*)
 	VTE4_WRONG_PACKAGE=1;;&  # https://gitlab.alpinelinux.org/alpine/aports/-/issues/17029
-opensuse-tumbleweed-* | opensuse-leap-16.0)
+opensuse-leap-16.0)
 	SEPARATE_GLIBUNIX=1;;&
 centos-* | rhel-* | almalinux-*)
 	SKIP_TEMPLATE=1;;&  # Not available on RHEL/CentOS
