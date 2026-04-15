@@ -21,7 +21,7 @@
         "@girs/gio-2.0": "2.86.4-4.0.0-beta.40",
         "eslint": "9.39.4",
         "eslint-config-gnome": "git+https://gitlab.gnome.org/World/javascript/eslint-config-gnome.git#c479d059e8d9ea99c3b53c2ea43abf7fdb05eb51",
-        "eslint-plugin-jsdoc": "62.8.0",
+        "eslint-plugin-jsdoc": "62.9.0",
         "jsdoc": "4.0.5",
         "typescript": "6.0.2",
         "typescript-eslint": "8.58.1"
