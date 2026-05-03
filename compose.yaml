@@ -317,16 +317,6 @@ services:
       dockerfile: archlinux.dockerfile
       target: packagekit
 
-  alpine-3.20:
-    <<: *x-service-openrc
-    environment:
-      <<: *base-environment
-      BUILD_DIR: ${PWD}/tests/build-alpine-3.20
-    build:
-      context: tests
-      dockerfile: alpine-3.20.dockerfile
-      target: base
-
   alpine-3.21:
     <<: *x-service-openrc
     environment:
