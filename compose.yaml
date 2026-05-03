@@ -257,26 +257,6 @@ services:
       dockerfile: debian-sid.dockerfile
       target: packagekit
 
-  opensuse-leap-15.6:
-    <<: *x-service-base
-    environment:
-      <<: *base-environment
-      BUILD_DIR: ${PWD}/tests/build-opensuse-leap-15.6
-    build:
-      context: tests
-      dockerfile: opensuse-leap-15.6.dockerfile
-      target: base
-
-  opensuse-leap-15.6-packagekit:
-    <<: *x-service-packagekit
-    environment:
-      <<: *base-environment
-      BUILD_DIR: ${PWD}/tests/build-opensuse-leap-15.6-packagekit
-    build:
-      context: tests
-      dockerfile: opensuse-leap-15.6.dockerfile
-      target: packagekit
-
   opensuse-leap-16.0:
     <<: *x-service-base
     environment:
