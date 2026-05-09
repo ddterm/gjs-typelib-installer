@@ -16,6 +16,9 @@
       "versioning": "npm"
     }
   ],
+  "constraints": {
+    "npm": ">=11.13.0"
+  },
   "dockerfile": {
     "enabled": false
   }
