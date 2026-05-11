@@ -94,7 +94,7 @@ class Report {
  * @returns {(packageName: string) => string[]}
  */
 function listFilesCommand() {
-    let osIds = [GLib.get_os_info('ID')];
+    const osIds = [GLib.get_os_info('ID')];
 
     for (const like of GLib.get_os_info('ID_LIKE')?.split(' ') ?? []) {
         if (like)

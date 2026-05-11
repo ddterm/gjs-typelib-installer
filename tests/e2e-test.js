@@ -63,8 +63,11 @@ async function main(srcPath, typelibs) {
     }
 
     const found = installer.require(versions);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-    const giRepo = GIRepository.Repository.dup_default?.() ?? GIRepository.Repository.get_default?.();
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const giRepo =
+        /* eslint-disable-next-line @typescript-eslint/no-unsafe-call,
+        @typescript-eslint/no-unsafe-member-access */
+        GIRepository.Repository.dup_default?.() ?? GIRepository.Repository.get_default?.();
 
     for (const [namespace, version] of Object.entries(versions)) {
         /** @type {{ __version__: string }|undefined} */
@@ -80,8 +83,12 @@ async function main(srcPath, typelibs) {
             );
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-        /** @type {string} */ const typelibPath = giRepo.get_typelib_path(namespace);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        /** @type {string} */ const typelibPath =
+            /* eslint-disable-next-line @typescript-eslint/no-unsafe-call,
+            @typescript-eslint/no-unsafe-member-access */
+            giRepo.get_typelib_path(namespace);
+
         const typelibFileName = GLib.path_get_basename(typelibPath);
         const expectedFileName = installer.packages[namespace]?.[version]?.().filename;
 

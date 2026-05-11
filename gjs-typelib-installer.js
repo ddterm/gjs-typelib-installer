@@ -28,9 +28,9 @@ function getVersionPrefix(version) {
  * @returns {string[]} List of OS identifiers.
  */
 function getOsIds() {
-    let osIds = [];
-    let osId = GLib.get_os_info('ID');
-    let osVersionId = GLib.get_os_info('VERSION_ID');
+    const osIds = [];
+    const osId = GLib.get_os_info('ID');
+    const osVersionId = GLib.get_os_info('VERSION_ID');
 
     if (!osId)
         throw new Error('Can not query OS info');

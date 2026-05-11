@@ -14,17 +14,28 @@ export default defineConfig([
         plugins: {gnome},
         extends: ['gnome/recommended'],
         rules: {
+            'max-len': [
+                'error',
+                100,
+                {
+                    ignoreUrls: true,
+                    ignoreStrings: true,
+                    ignoreTemplateLiterals: true,
+                },
+            ],
             camelcase: ['error', {
                 properties: 'never',
             }],
             'consistent-return': 'error',
-            'eqeqeq': ['error', 'smart'],
-            'key-spacing': ['error', {
-                mode: 'minimum',
-                beforeColon: false,
-                afterColon: true,
-            }],
             'prefer-arrow-callback': 'error',
+            'prefer-const': ['error', {
+                destructuring: 'all',
+            }],
+            'prefer-destructuring': 'error',
+            'no-multiple-empty-lines': [
+                'error',
+                {max: 1},
+            ],
         },
     },
     {
