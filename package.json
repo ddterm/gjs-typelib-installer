@@ -18,7 +18,7 @@
     "devDependencies": {
         "@eslint/js": "9.39.4",
         "@girs/gio-2.0": "2.86.4-4.0.0-beta.40",
-        "@girs/gjs": "4.0.0-rc.9",
+        "@girs/gjs": "4.0.0-rc.15",
         "eslint": "9.39.4",
         "eslint-config-gnome": "https://github.com/ddterm/eslint-config-gnome/archive/c479d059e8d9ea99c3b53c2ea43abf7fdb05eb51.tar.gz",
         "eslint-plugin-jsdoc": "62.9.0",
