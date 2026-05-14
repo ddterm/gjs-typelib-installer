@@ -24,7 +24,7 @@
         "eslint-plugin-jsdoc": "62.9.0",
         "jsdoc": "4.0.5",
         "typescript": "6.0.3",
-        "typescript-eslint": "8.59.2"
+        "typescript-eslint": "8.59.3"
     },
     "scripts": {
         "lint": "eslint",
