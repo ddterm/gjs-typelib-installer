@@ -4,7 +4,7 @@
 
 FROM docker.io/opensuse/tumbleweed AS base
 
-RUN zypper --non-interactive install --no-recommends -f systemd gjs pkexec expect meson && \
+RUN zypper --non-interactive install --no-recommends -f systemd gjs typelib-1_0-GioUnix-2_0 pkexec expect meson && \
 	zypper clean --all
 
 COPY files /
