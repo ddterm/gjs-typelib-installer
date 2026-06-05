@@ -57,6 +57,26 @@ x-service-packagekit: &x-service-packagekit
   profiles: [packagekit]
 
 services:
+  almalinux-10:
+    <<: *x-service-base
+    environment:
+      <<: *base-environment
+      BUILD_DIR: ${PWD}/tests/build-almalinux-10
+    build:
+      context: tests
+      dockerfile: almalinux-10.dockerfile
+      target: base
+
+  almalinux-10-packagekit:
+    <<: *x-service-packagekit
+    environment:
+      <<: *base-environment
+      BUILD_DIR: ${PWD}/tests/build-almalinux-10-packagekit
+    build:
+      context: tests
+      dockerfile: almalinux-10.dockerfile
+      target: packagekit
+
   centos-10:
     <<: *x-service-base
     environment:
