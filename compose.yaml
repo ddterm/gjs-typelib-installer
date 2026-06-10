@@ -367,6 +367,16 @@ services:
       dockerfile: alpine-3.23.dockerfile
       target: base
 
+  alpine-3.24:
+    <<: *x-service-openrc
+    environment:
+      <<: *base-environment
+      BUILD_DIR: ${PWD}/tests/build-alpine-3.24
+    build:
+      context: tests
+      dockerfile: alpine-3.24.dockerfile
+      target: base
+
   alpine-edge:
     <<: *x-service-openrc
     environment:
