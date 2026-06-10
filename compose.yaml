@@ -97,26 +97,6 @@ services:
       dockerfile: centos-10.dockerfile
       target: packagekit
 
-  fedora-42:
-    <<: *x-service-base
-    environment:
-      <<: *base-environment
-      BUILD_DIR: ${PWD}/tests/build-fedora-42
-    build:
-      context: tests
-      dockerfile: fedora-42.dockerfile
-      target: base
-
-  fedora-42-packagekit:
-    <<: *x-service-packagekit
-    environment:
-      <<: *base-environment
-      BUILD_DIR: ${PWD}/tests/build-fedora-42-packagekit
-    build:
-      context: tests
-      dockerfile: fedora-42.dockerfile
-      target: packagekit
-
   fedora-43:
     <<: *x-service-base
     environment:
