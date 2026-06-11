@@ -11,6 +11,7 @@ x-service-base: &x-service-base
   cgroup: private
   user: root
   userns_mode: keep-id:uid=1001,gid=1001
+  network_mode: bridge
 
   cap_add:
     - SYS_ADMIN
