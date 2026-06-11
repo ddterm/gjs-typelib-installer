@@ -16,10 +16,10 @@
     },
     "type": "module",
     "devDependencies": {
-        "@eslint/js": "9.39.4",
+        "@eslint/js": "10.0.1",
         "@girs/gio-2.0": "2.88.0-4.0.4",
         "@girs/gjs": "4.0.4",
-        "eslint": "9.39.4",
+        "eslint": "10.4.1",
         "eslint-config-gnome": "https://github.com/ddterm/eslint-config-gnome/archive/c479d059e8d9ea99c3b53c2ea43abf7fdb05eb51.tar.gz",
         "eslint-plugin-jsdoc": "63.0.1",
         "jsdoc": "4.0.5",
