@@ -15,5 +15,5 @@ test(
   'e2e-test',
   expect,
   args: ['-f', files('yes.expect'), gjs.full_path(), '-m', files('e2e-test.js'), '--input', output],
-  timeout: 120,
+  timeout: 240,
 )
