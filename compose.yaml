@@ -157,26 +157,6 @@ services:
       dockerfile: ubuntu-24.04.dockerfile
       target: packagekit
 
-  ubuntu-25.10:
-    <<: *x-service-base
-    environment:
-      <<: *base-environment
-      BUILD_DIR: ${PWD}/tests/build-ubuntu-25.10
-    build:
-      context: tests
-      dockerfile: ubuntu-25.10.dockerfile
-      target: base
-
-  ubuntu-25.10-packagekit:
-    <<: *x-service-packagekit
-    environment:
-      <<: *base-environment
-      BUILD_DIR: ${PWD}/tests/build-ubuntu-25.10-packagekit
-    build:
-      context: tests
-      dockerfile: ubuntu-25.10.dockerfile
-      target: packagekit
-
   ubuntu-26.04:
     <<: *x-service-base
     environment:
