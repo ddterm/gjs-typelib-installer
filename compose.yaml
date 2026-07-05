@@ -297,36 +297,6 @@ services:
       dockerfile: archlinux.dockerfile
       target: packagekit
 
-  alpine-3.21:
-    <<: *x-service-openrc
-    environment:
-      <<: *base-environment
-      BUILD_DIR: ${PWD}/tests/build-alpine-3.21
-    build:
-      context: tests
-      dockerfile: alpine-3.21.dockerfile
-      target: base
-
-  alpine-3.22:
-    <<: *x-service-openrc
-    environment:
-      <<: *base-environment
-      BUILD_DIR: ${PWD}/tests/build-alpine-3.22
-    build:
-      context: tests
-      dockerfile: alpine-3.22.dockerfile
-      target: base
-
-  alpine-3.23:
-    <<: *x-service-openrc
-    environment:
-      <<: *base-environment
-      BUILD_DIR: ${PWD}/tests/build-alpine-3.23
-    build:
-      context: tests
-      dockerfile: alpine-3.23.dockerfile
-      target: base
-
   alpine-3.24:
     <<: *x-service-openrc
     environment:
