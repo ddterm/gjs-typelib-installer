@@ -26,6 +26,12 @@
         "typescript": "6.0.3",
         "typescript-eslint": "8.61.1"
     },
+    "overrides": {
+        "eslint-config-gnome": {
+            "@eslint/js": "$@eslint/js",
+            "eslint-plugin-jsdoc": "$eslint-plugin-jsdoc"
+        }
+    },
     "scripts": {
         "lint": "eslint",
         "eslint": "eslint",
