@@ -21,7 +21,7 @@
         "@girs/gjs": "5.0.0",
         "eslint": "9.39.5",
         "eslint-config-gnome": "https://github.com/ddterm/eslint-config-gnome/archive/c479d059e8d9ea99c3b53c2ea43abf7fdb05eb51.tar.gz",
-        "eslint-plugin-jsdoc": "63.0.6",
+        "eslint-plugin-jsdoc": "64.3.10",
         "jsdoc": "4.0.5",
         "typescript": "6.0.3",
         "typescript-eslint": "8.70.0"
