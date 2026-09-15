@@ -46,12 +46,12 @@ async function main(srcPath, typelibs) {
             throw error;
 
         if (error.files.size > 0)
-            throw new Error(`Unresolved files: ${error.message}`);
+            throw new Error(`Unresolved files: ${error.message}`, {cause: error});
 
         const command = await installer.findInstallCommand();
 
         if (!command)
-            throw new Error('Unexpected: no working install command found');
+            throw new Error('Unexpected: no working install command found', {cause: error});
 
         const argv = command(error.packages);
 
