@@ -197,6 +197,26 @@ services:
       dockerfile: ubuntu-26.04.dockerfile
       target: packagekit
 
+  ubuntu-26.10:
+    <<: *x-service-base
+    environment:
+      <<: *base-environment
+      BUILD_DIR: ${PWD}/tests/build-ubuntu-26.10
+    build:
+      context: tests
+      dockerfile: ubuntu-26.10.dockerfile
+      target: base
+
+  ubuntu-26.10-packagekit:
+    <<: *x-service-packagekit
+    environment:
+      <<: *base-environment
+      BUILD_DIR: ${PWD}/tests/build-ubuntu-26.10-packagekit
+    build:
+      context: tests
+      dockerfile: ubuntu-26.10.dockerfile
+      target: packagekit
+
   debian-stable:
     <<: *x-service-base
     environment:
