@@ -1,3 +1,9 @@
+/**
+ * Find and install OS packages for missing `gi://` imports.
+ *
+ * @module gjs-typelib-installer.js
+ */
+
 // SPDX-FileCopyrightText: 2025 Aleksandr Mezin <mezin.alexander@gmail.com>
 //
 // SPDX-License-Identifier: MIT
@@ -289,7 +295,8 @@ export class MissingDependencies extends Error {
  * @param {Partial<Record<string, string>>} versions - An object with
  * namespaces as keys and verions as values.
  * @returns {Partial<Record<string, any>>} Imported modules.
- * @throws {MissingDependencies} If a known library is not installed.
+ * @throws {MissingDependencies} If a known library is not installed, see
+ * {@link MissingDependencies}.
  * @throws {Error} If unknown library is requested.
  */
 export function require(versions) {
@@ -553,7 +560,6 @@ async function findPackageKitInstallCommand(cancellable = null) {
  * Finds the command to install OS packages. Prefers PackageKit pkgcli/pkcon
  * when available. Falls back to native package managers with pkexec.
  *
- * @async
  * @param {Gio.Cancellable|null} cancellable - Optional cancellable
  * for aborting the operation.
  * @returns {Promise<InstallCommandResolver|null>} A function that generates
@@ -621,7 +627,6 @@ export async function findInstallCommand(cancellable = null) {
  * Finds a terminal emulator to run commands in.
  * Checks for GNOME Console (kgx), gnome-terminal, and xdg-terminal-exec in order.
  *
- * @async
  * @param {Gio.Cancellable|null} cancellable - Optional cancellable for aborting the operation.
  * @returns {Promise<TerminalCommandResolver|null>} A function that generates
  * the command line, or null if no suitable terminal is found.
@@ -654,7 +659,6 @@ export async function findTerminalCommand(cancellable = null) {
  * Combines the results of findTerminalCommand and findInstallCommand to create
  * a complete installation command that runs in a terminal.
  *
- * @async
  * @param {Gio.Cancellable|null} cancellable - Optional cancellable for aborting the operation.
  * @returns {Promise<InstallCommandResolver|null>} A function that,
  * given the list of packages, generates the installation command,

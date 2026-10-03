@@ -1,0 +1,12 @@
+// SPDX-FileCopyrightText: 2026 Aleksandr Mezin <mezin.alexander@gmail.com>
+
+// SPDX-License-Identifier: CC0-1.0
+
+{
+    "$schema": "https://typedoc.org/schema.json",
+    "entryPoints": ["gjs-typelib-installer.js"],
+    "html": "html",
+    "name": "gjs-typelib-installer",
+    "tsconfig": "tsconfig.json",
+    "plugin": ["typedoc-plugin-mdn-links"],
+}

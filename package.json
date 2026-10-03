@@ -22,7 +22,8 @@
         "eslint": "10.11.0",
         "eslint-config-gnome": "https://github.com/ddterm/eslint-config-gnome/archive/c479d059e8d9ea99c3b53c2ea43abf7fdb05eb51.tar.gz",
         "eslint-plugin-jsdoc": "65.0.0",
-        "jsdoc": "4.0.5",
+        "typedoc": "0.28.20",
+        "typedoc-plugin-mdn-links": "5.1.1",
         "typescript": "6.0.3",
         "typescript-eslint": "8.71.0"
     },
@@ -37,8 +38,8 @@
         "eslint": "eslint",
         "tsc": "tsc",
         "typecheck": "tsc",
-        "doc": "jsdoc -c jsdoc.jsonc",
-        "jsdoc": "jsdoc -c jsdoc.jsonc",
+        "doc": "typedoc",
+        "typedoc": "typedoc",
         "test": "tests/test.js"
     }
 }
