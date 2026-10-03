@@ -16,8 +16,8 @@ import Gi from 'gi';
  * Extract the version prefix by removing the last component.
  *
  * @private
- * @param {string} version - Version string.
- * @returns {string} Version prefix without the last component, or empty string.
+ * @param {string} version - The version string.
+ * @returns {string} The version prefix without the last component, or an empty string.
  */
 function getVersionPrefix(version) {
     const index = version.lastIndexOf('.');
@@ -26,12 +26,12 @@ function getVersionPrefix(version) {
 }
 
 /**
- * Get list of OS identifiers (from /etc/os-release) for package resolution.
+ * Get the list of OS identifiers (from /etc/os-release) for package resolution.
  * Generates version-specific IDs (e.g., "debian:12", "debian:11")
  * and includes ID_LIKE entries for derivative distributions.
  *
  * @private
- * @returns {string[]} List of OS identifiers.
+ * @returns {string[]} The list of OS identifiers.
  */
 function getOsIds() {
     const osIds = [];
@@ -62,7 +62,7 @@ function getOsIds() {
 }
 
 /**
- * Cached list of OS identifiers for package resolution.
+ * The cached list of OS identifiers for package resolution.
  *
  * @private
  * @type {string[]|undefined}
@@ -70,10 +70,10 @@ function getOsIds() {
 let cachedOsIds;
 
 /**
- * Get cached list of OS identifiers for package resolution.
+ * Get the cached list of OS identifiers for package resolution.
  *
  * @private
- * @returns {string[]} Cached list of OS identifiers.
+ * @returns {string[]} The cached list of OS identifiers.
  */
 function getOsIdsCached() {
     cachedOsIds ??= getOsIds();
@@ -82,30 +82,30 @@ function getOsIdsCached() {
 }
 
 /**
- * Information about typelib dependency - object with typelib file name
+ * Information about a typelib dependency - an object with the typelib file name
  * and an optional list of OS packages to install.
  *
  * @typedef TypelibInfo
- * @property {string} filename - File name of the library.
- * @property {string[]|null} [packages] - List of OS packages that need to be
+ * @property {string} filename - The file name of the library.
+ * @property {string[]|null} [packages] - The list of OS packages that need to be
  * installed to use this library.
  */
 
 /**
- * Function that resolves typelib package name(s) for the current distro.
+ * A function that resolves typelib package name(s) for the current distro.
  *
  * @callback TypelibResolver
- * @returns {TypelibInfo} Typelib file name and optional package list.
+ * @returns {TypelibInfo} The typelib file name and an optional package list.
  */
 
 /**
- * Resolve a typelib file name to package information based on OS ID.
- * Iterates through cached OS IDs and returns the first matching distro entry.
+ * Resolve a typelib file name to package information based on the OS ID.
+ * Iterates through the cached OS IDs and returns the first matching distro entry.
  *
  * @private
  * @param {string} filename - The typelib filename to resolve.
- * @param {Partial<Record<string,string[]|null>>} distros - Mapping of OS IDs to package lists.
- * @returns {TypelibInfo} Typelib information with filename and optional packages.
+ * @param {Partial<Record<string,string[]|null>>} distros - A mapping of OS IDs to package lists.
+ * @returns {TypelibInfo} The typelib information with filename and optional packages.
  */
 function resolveByOsId(filename, distros) {
     for (const osId of getOsIdsCached()) {
@@ -249,7 +249,7 @@ export const packages = {
 };
 
 /**
- * Error thrown when GObject typelibs are missing.
+ * An error thrown when GObject typelibs are missing.
  * This error is thrown by {@link require} when one or more typelibs cannot be
  * loaded and their corresponding packages or files are identified as missing.
  */
@@ -296,11 +296,11 @@ export class MissingDependencies extends Error {
  * Import multiple GObject libraries and return the imported modules.
  *
  * @param {Partial<Record<string, string>>} versions - An object with
- * namespaces as keys and verions as values.
+ * namespaces as keys and versions as values.
  * @returns {Partial<Record<string, any>>} Imported modules.
  * @throws {MissingDependencies} If a known library is not installed, see
  * {@link MissingDependencies}.
- * @throws {Error} If unknown library is requested.
+ * @throws {Error} If an unknown library is requested.
  *
  * @example <caption>Import 'gi://Handy?version=1' or ask the user to install packages</caption>
  * try {
@@ -372,7 +372,7 @@ export function require(versions) {
  *
  * @private
  * @param {Iterable<string>|Array<string>} argv - Command line arguments.
- * @returns {string} Shell-quoted and joined command string.
+ * @returns {string} The shell-quoted and joined command string.
  */
 function shellJoin(argv) {
     if (!Array.isArray(argv))
@@ -383,8 +383,8 @@ function shellJoin(argv) {
 
 /**
  * @private
- * @param {Gio.Subprocess} subprocess - Subprocess to wait for.
- * @param {Gio.Cancellable | null} cancellable - Cancellable object or null.
+ * @param {Gio.Subprocess} subprocess - The subprocess to wait for.
+ * @param {Gio.Cancellable | null} cancellable - The cancellable object or null.
  * @returns {Promise<void>}
  */
 function waitCheck(subprocess, cancellable) {
@@ -403,10 +403,10 @@ function waitCheck(subprocess, cancellable) {
 
 /**
  * @private
- * @param {Gio.Subprocess} subprocess - Subprocess to communicate with.
- * @param {string | null} stdinBuf - Data to send to stdin or null.
+ * @param {Gio.Subprocess} subprocess - The subprocess to communicate with.
+ * @param {string | null} stdinBuf - The data to send to stdin or null.
  * @param {Gio.Cancellable | null} cancellable - Optional cancellable for aborting the operation.
- * @returns {Promise<string[]>} - Stdout and stderr as array: [stdout, stderr].
+ * @returns {Promise<[string, string | null]>} - Stdout and nullable stderr as [stdout, stderr].
  */
 function communicateUtf8(subprocess, stdinBuf, cancellable) {
     return new Promise((resolve, reject) => {
@@ -425,12 +425,12 @@ function communicateUtf8(subprocess, stdinBuf, cancellable) {
 }
 
 /**
- * Spawn a subprocess, wait for it to terminate, and get its stdout as string.
+ * Spawn a subprocess, wait for it to terminate, and get its stdout as a string.
  *
  * @private
- * @param {string[]} argv - Command line.
+ * @param {string[]} argv - The command line.
  * @param {Gio.Cancellable|null} cancellable - Optional cancellable for aborting the operation.
- * @returns {Promise<string>} Subprocess stdout as string.
+ * @returns {Promise<string>} The subprocess stdout as a string.
  */
 async function getSubprocessOutput(argv, cancellable = null) {
     cancellable?.set_error_if_cancelled();
@@ -454,12 +454,12 @@ async function getSubprocessOutput(argv, cancellable = null) {
 }
 
 /**
- * Parse the JSON output from 'pkgcli --json backend' command.
+ * Parse the JSON output from the 'pkgcli --json backend' command.
  * Extracts and validates the roles array from the JSON response.
  *
  * @private
- * @param {string} stdout - Output of 'pkgcli --json backend'.
- * @returns {unknown[]} Roles as array.
+ * @param {string} stdout - The output of 'pkgcli --json backend'.
+ * @returns {unknown[]} The roles as an array.
  */
 function parsePkgCliRoles(stdout) {
     const json = /** @type {unknown} */ (JSON.parse(stdout));
@@ -485,13 +485,13 @@ function parsePkgCliRoles(stdout) {
  * A function that, given a list of packages, generates the installation command.
  *
  * @callback InstallCommandResolver
- * @param {Iterable<string>} pkgs - List of package names to install.
- * @returns {string[]} Command line, as argument list (argv).
+ * @param {Iterable<string>} pkgs - The list of package names to install.
+ * @returns {string[]} The command line, as an argument list (argv).
  */
 
 /**
  * Finds the command to install OS packages using PackageKit.
- * Checks for pkgcli and pkcon utilities, returning a function that generates
+ * Checks for the pkgcli and pkcon utilities, returning a function that generates
  * the appropriate installation command with cache refresh if supported.
  *
  * @private
@@ -637,8 +637,8 @@ export async function findInstallCommand(cancellable = null) {
  * to run the specified command in a terminal emulator.
  *
  * @callback TerminalCommandResolver
- * @param {Iterable<string>} argv - Command line arguments to run in terminal.
- * @returns {string[]} Command line, as argument list (argv).
+ * @param {Iterable<string>} argv - The command line arguments to run in a terminal.
+ * @returns {string[]} The command line, as an argument list (argv).
  */
 
 /**
@@ -672,7 +672,7 @@ export async function findTerminalCommand(cancellable = null) {
 }
 
 /**
- * Finds the command to install OS packages. Prefers PackageKit CLI when
+ * Finds the command to install OS packages. Prefers the PackageKit CLI when
  * available. Wraps the command to launch it in a terminal emulator.
  * Combines the results of findTerminalCommand and findInstallCommand to create
  * a complete installation command that runs in a terminal.
@@ -680,7 +680,7 @@ export async function findTerminalCommand(cancellable = null) {
  * @param {Gio.Cancellable|null} cancellable - Optional cancellable for aborting the operation.
  * @returns {Promise<InstallCommandResolver|null>} A function that,
  * given the list of packages, generates the installation command,
- * wrapped for terminal execution, or null if terminal or install command not found.
+ * wrapped for terminal execution, or null if no terminal or install command is found.
  *
  * @example <caption>Install Gtk 4 package in a separate terminal window</caption>
  * findTerminalInstallCommand().then(installer => {
