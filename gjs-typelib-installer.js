@@ -124,6 +124,9 @@ function resolveByOsId(filename, distros) {
  * that returns the appropriate package names for the current OS.
  *
  * @type {Partial<Record<string, Partial<Record<string, TypelibResolver>>>>}
+ *
+ * @example <caption>Get the package name for Gtk 4.0 on the current OS</caption>
+ * packages.Gtk['4.0']().packages
  */
 export const packages = {
     Adw: {
@@ -298,6 +301,21 @@ export class MissingDependencies extends Error {
  * @throws {MissingDependencies} If a known library is not installed, see
  * {@link MissingDependencies}.
  * @throws {Error} If unknown library is requested.
+ *
+ * @example <caption>Import 'gi://Handy?version=1' or ask the user to install packages</caption>
+ * try {
+ *     const {Handy} = require({Handy: '1'});
+ *     // ...
+ * } catch (ex) {
+ *     if (!(ex instanceof MissingDependencies))
+ *         throw ex;
+ *
+ *     if (ex.packages.size > 0)
+ *         printerr(`Please install the packages: ${[...ex.packages]}`);
+ *
+ *     if (ex.files.size > 0)
+ *         printerr(`Please install the packages that contain the files: ${[...ex.files]}`);
+ * }
  */
 export function require(versions) {
     /** @type {Partial<Record<string, any>>} */
@@ -663,6 +681,24 @@ export async function findTerminalCommand(cancellable = null) {
  * @returns {Promise<InstallCommandResolver|null>} A function that,
  * given the list of packages, generates the installation command,
  * wrapped for terminal execution, or null if terminal or install command not found.
+ *
+ * @example <caption>Install Gtk 4 package in a separate terminal window</caption>
+ * findTerminalInstallCommand().then(installer => {
+ *     if (!installer) {
+ *         printerr("Can't install packages");
+ *         return;
+ *     }
+ *
+ *     const pkgs = packages.Gtk['4.0']().packages;
+ *     if (!pkgs) {
+ *         printerr("Can't find a Gtk 4.0 package for this OS");
+ *         return;
+ *     }
+ *
+ *     const argv = installer(pkgs);
+ *     const [, pid] = GLib.spawn_async(null, argv, null, GLib.SpawnFlags.DEFAULT, null);
+ *     GLib.spawn_close_pid(pid);
+ * });
  */
 export async function findTerminalInstallCommand(cancellable = null) {
     cancellable?.set_error_if_cancelled();
