@@ -127,6 +127,7 @@ function listFilesCommand() {
  */
 function listFiles(packageName) {
     const command = listFilesCommand();
+    /** @type {GLib.SpawnFlags} */
     const spawnFlags = GLib.SpawnFlags.SEARCH_PATH | GLib.SpawnFlags.CHILD_INHERITS_STDERR;
     const resolvedCommand = command(packageName);
     const commandLine = resolvedCommand.map(arg => GLib.shell_quote(arg)).join(' ');
