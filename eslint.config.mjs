@@ -10,7 +10,7 @@ import gnome from 'eslint-config-gnome';
 
 export default defineConfig([
     {
-        files: ['*.js', '*.mjs', 'tests/*.js'],
+        files: ['*.js', '*.mjs', 'tests/*.js', 'examples/*.js'],
         plugins: {gnome},
         extends: ['gnome/recommended'],
         rules: {
@@ -42,8 +42,8 @@ export default defineConfig([
         files: [
             'ambient.d.ts',
             'gjs-typelib-installer.js',
-            'tests/test.js',
-            'tests/e2e-test.js',
+            'tests/*.js',
+            'examples/*.js',
         ],
         plugins: {jsdoc, tseslint},
         extends: [
@@ -72,6 +72,7 @@ export default defineConfig([
     {
         files: [
             'tests/*.js',
+            'examples/*.js',
         ],
         plugins: {jsdoc},
         rules: {

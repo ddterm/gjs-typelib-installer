@@ -9,4 +9,7 @@
     "name": "gjs-typelib-installer",
     "tsconfig": "tsconfig.json",
     "plugin": ["typedoc-plugin-mdn-links"],
+    "jsDocCompatibility": {
+        "exampleTag": false
+    }
 }

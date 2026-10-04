@@ -123,8 +123,8 @@ function resolveByOsId(filename, distros) {
  * Organized by namespace and version, each entry maps to a resolver function
  * that returns the appropriate package names for the current OS.
  *
- * @example <caption>Get the package name for Gtk 4.0 on the current OS</caption>
- * packages.Gtk['4.0']().packages
+ * @example Get the package name for Gtk 4.0 on the current OS
+ * {@includeCode examples/gtk4-pkg-name.js#example}
  */
 export const packages = {
     Adw: {
@@ -300,20 +300,8 @@ export class MissingDependencies extends Error {
  * {@link MissingDependencies}.
  * @throws {Error} If an unknown library is requested.
  *
- * @example <caption>Import 'gi://Handy?version=1' or ask the user to install packages</caption>
- * try {
- *     const {Handy} = require({Handy: '1'});
- *     // ...
- * } catch (ex) {
- *     if (!(ex instanceof MissingDependencies))
- *         throw ex;
- *
- *     if (ex.packages.size > 0)
- *         printerr(`Please install the packages: ${[...ex.packages]}`);
- *
- *     if (ex.files.size > 0)
- *         printerr(`Please install the packages that contain the files: ${[...ex.files]}`);
- * }
+ * @example Import Template-GLib or ask the user to install packages
+ * {@includeCode examples/require-template.js#example}
  */
 export function require(versions) {
     /** @type {Partial<Record<string, any>>} */
@@ -648,6 +636,9 @@ export async function findInstallCommand(cancellable = null) {
  * @param {Gio.Cancellable|null} cancellable - Optional cancellable for aborting the operation.
  * @returns {Promise<TerminalCommandResolver|null>} A function that generates
  * the command line, or null if no suitable terminal is found.
+ *
+ * @example "Hello, World!" in a new terminal
+ * {@includeCode examples/terminal-hello.js#example}
  */
 // eslint-disable-next-line @typescript-eslint/require-await
 export async function findTerminalCommand(cancellable = null) {
@@ -682,23 +673,8 @@ export async function findTerminalCommand(cancellable = null) {
  * given the list of packages, generates the installation command,
  * wrapped for terminal execution, or null if no terminal or install command is found.
  *
- * @example <caption>Install Gtk 4 package in a separate terminal window</caption>
- * findTerminalInstallCommand().then(installer => {
- *     if (!installer) {
- *         printerr("Can't install packages");
- *         return;
- *     }
- *
- *     const pkgs = packages.Gtk['4.0']().packages;
- *     if (!pkgs) {
- *         printerr("Can't find a Gtk 4.0 package for this OS");
- *         return;
- *     }
- *
- *     const argv = installer(pkgs);
- *     const [, pid] = GLib.spawn_async(null, argv, null, GLib.SpawnFlags.DEFAULT, null);
- *     GLib.spawn_close_pid(pid);
- * });
+ * @example Install Template-GLib package in a separate terminal window
+ * {@includeCode examples/install-template.js#example}
  */
 export async function findTerminalInstallCommand(cancellable = null) {
     cancellable?.set_error_if_cancelled();

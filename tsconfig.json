@@ -18,10 +18,10 @@
     ],
   },
   "include": [
-    "eslint.config.mjs",
     "ambient.d.ts",
+    "eslint.config.mjs",
     "gjs-typelib-installer.js",
-    "tests/test.js",
-    "tests/e2e-test.js",
+    "tests/*.js",
+    "examples/*.js",
   ],
 }
