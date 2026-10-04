@@ -11,6 +11,8 @@ import GIRepository from 'gi://GIRepository';
 
 import System from 'system';
 
+/** @import {TypelibResolver} from '../gjs-typelib-installer.js' */
+
 const GNU_SKIP_RETURNCODE = 77;
 const GNU_ERROR_RETURNCODE = 99;
 
@@ -90,7 +92,9 @@ async function main(srcPath, typelibs) {
             giRepo.get_typelib_path(namespace);
 
         const typelibFileName = GLib.path_get_basename(typelibPath);
-        const expectedFileName = installer.packages[namespace]?.[version]?.().filename;
+        /** @type {{packages: Partial<Record<string, Partial<Record<string, TypelibResolver>>>>}} */
+        const {packages} = installer;
+        const expectedFileName = packages[namespace]?.[version]?.().filename;
 
         if (typelibFileName !== expectedFileName) {
             throw new Error(

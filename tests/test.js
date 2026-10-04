@@ -199,9 +199,6 @@ async function main(srcPath, typelibFilter, noExitCode) {
     const report = new Report();
 
     for (const [namespace, versions] of Object.entries(installer.packages)) {
-        if (!versions)
-            continue;
-
         for (const [version, resolveFunc] of Object.entries(versions)) {
             const name = `${namespace}-${version}`;
 

@@ -123,8 +123,6 @@ function resolveByOsId(filename, distros) {
  * Organized by namespace and version, each entry maps to a resolver function
  * that returns the appropriate package names for the current OS.
  *
- * @type {Partial<Record<string, Partial<Record<string, TypelibResolver>>>>}
- *
  * @example <caption>Get the package name for Gtk 4.0 on the current OS</caption>
  * packages.Gtk['4.0']().packages
  */
@@ -329,7 +327,9 @@ export function require(versions) {
         if (typeof version !== 'string')
             throw new Error(`Version for namespace ${namespace} is not a string`);
 
-        const resolver = packages[namespace]?.[version];
+        /** @type {Partial<Record<string, Partial<Record<string, TypelibResolver>>>>} */
+        const resolvers = packages;
+        const resolver = resolvers[namespace]?.[version];
 
         if (!resolver) {
             throw new Error([
