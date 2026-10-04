@@ -6,7 +6,10 @@
 
 import GLib from 'gi://GLib';
 import Gio from 'gi://Gio';
-// @ts-expect-error no types available
+
+/** @import GIRepository2 from '@girs/girepository-2.0' */
+/** @import GIRepository3 from '@girs/girepository-3.0' */
+
 import GIRepository from 'gi://GIRepository';
 
 import System from 'system';
@@ -65,11 +68,10 @@ async function main(srcPath, typelibs) {
     }
 
     const found = installer.require(versions);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const giRepo =
-        /* eslint-disable-next-line @typescript-eslint/no-unsafe-call,
-        @typescript-eslint/no-unsafe-member-access */
-        GIRepository.Repository.dup_default?.() ?? GIRepository.Repository.get_default?.();
+    const {Repository} = GIRepository;
+    const giRepo = 'get_default' in Repository
+        ? /** @type {typeof GIRepository2.Repository} */ (Repository).get_default()
+        : /** @type {typeof GIRepository3.Repository} */ (Repository).dup_default();
 
     for (const [namespace, version] of Object.entries(versions)) {
         /** @type {{ __version__: string }|undefined} */
@@ -85,13 +87,9 @@ async function main(srcPath, typelibs) {
             );
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        /** @type {string} */ const typelibPath =
-            /* eslint-disable-next-line @typescript-eslint/no-unsafe-call,
-            @typescript-eslint/no-unsafe-member-access */
-            giRepo.get_typelib_path(namespace);
+        const typelibPath = giRepo.get_typelib_path(namespace);
+        const typelibFileName = GLib.path_get_basename(/** @type {string} */ (typelibPath));
 
-        const typelibFileName = GLib.path_get_basename(typelibPath);
         /** @type {{packages: Partial<Record<string, Partial<Record<string, TypelibResolver>>>>}} */
         const {packages} = installer;
         const expectedFileName = packages[namespace]?.[version]?.().filename;
