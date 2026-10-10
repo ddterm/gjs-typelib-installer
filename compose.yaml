@@ -338,14 +338,14 @@ services:
       dockerfile: archlinux.dockerfile
       target: packagekit
 
-  alpine-3.24:
+  alpine-latest:
     <<: *x-service-openrc
     environment:
       <<: *base-environment
-      BUILD_DIR: ${PWD}/tests/build-alpine-3.24
+      BUILD_DIR: ${PWD}/tests/build-alpine-latest
     build:
       context: tests
-      dockerfile: alpine-3.24.dockerfile
+      dockerfile: alpine-latest.dockerfile
       target: base
 
   alpine-edge:

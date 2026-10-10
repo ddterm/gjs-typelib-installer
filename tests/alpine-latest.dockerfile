@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-FROM docker.io/library/alpine:3.24 AS base
+FROM docker.io/library/alpine:latest AS base
 
 RUN apk add --no-cache bash openrc gjs dbus polkit expect meson
 
