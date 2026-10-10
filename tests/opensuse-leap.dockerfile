@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-FROM docker.io/opensuse/leap:16.0 AS base
+FROM docker.io/opensuse/leap:latest AS base
 
 RUN zypper --non-interactive install --no-recommends -f systemd gjs pkexec expect meson && \
 	zypper clean --all

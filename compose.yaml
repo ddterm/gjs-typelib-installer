@@ -278,24 +278,24 @@ services:
       dockerfile: debian-sid.dockerfile
       target: packagekit
 
-  opensuse-leap-16.0:
+  opensuse-leap:
     <<: *x-service-base
     environment:
       <<: *base-environment
-      BUILD_DIR: ${PWD}/tests/build-opensuse-leap-16.0
+      BUILD_DIR: ${PWD}/tests/build-opensuse-leap
     build:
       context: tests
-      dockerfile: opensuse-leap-16.0.dockerfile
+      dockerfile: opensuse-leap.dockerfile
       target: base
 
-  opensuse-leap-16.0-packagekit:
+  opensuse-leap-packagekit:
     <<: *x-service-packagekit
     environment:
       <<: *base-environment
-      BUILD_DIR: ${PWD}/tests/build-opensuse-leap-16.0-packagekit
+      BUILD_DIR: ${PWD}/tests/build-opensuse-leap-packagekit
     build:
       context: tests
-      dockerfile: opensuse-leap-16.0.dockerfile
+      dockerfile: opensuse-leap.dockerfile
       target: packagekit
 
   opensuse-tumbleweed:
