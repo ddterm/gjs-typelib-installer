@@ -4,7 +4,9 @@
 
 FROM ghcr.io/almalinux/10-init:latest AS base
 
-RUN dnf install -y --nodocs --setopt install_weak_deps=False gjs polkit expect meson && \
+RUN sed -i 's/^# baseurl=/baseurl=/g' /etc/yum.repos.d/*.repo && \
+	sed -i 's/^mirrorlist=/# mirrorlist=/g' /etc/yum.repos.d/*.repo && \
+	dnf install -y --nodocs --setopt install_weak_deps=False gjs polkit expect meson && \
 	dnf clean all -y
 
 COPY files /
