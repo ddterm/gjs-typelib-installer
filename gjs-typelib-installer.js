@@ -205,9 +205,6 @@ export const packages = {
         }),
         '3.91': () => resolveByOsId('Vte-3.91.typelib', {
             alpine: ['vte3-gtk4'],
-            // https://gitlab.alpinelinux.org/alpine/aports/-/issues/17029
-            'alpine:3.20': ['vte3', 'vte3-gtk4'],
-            'alpine:3.21': ['vte3', 'vte3-gtk4'],
             arch: ['vte4'],
             debian: ['gir1.2-vte-3.91'],
             fedora: ['vte291-gtk4'],
@@ -220,7 +217,6 @@ export const packages = {
             arch: ['glib2'],
             debian: ['gir1.2-glib-2.0'],
             fedora: ['glib2'],
-            'opensuse-leap:15': null,
             suse: ['typelib-1_0-Gio-2_0'],
         }),
     },
@@ -230,7 +226,6 @@ export const packages = {
             arch: ['glib2'],
             debian: ['gir1.2-glib-2.0'],
             fedora: ['glib2'],
-            'opensuse-leap:15': null,
             suse: ['typelib-1_0-GLibUnix-2_0'],
         }),
     },

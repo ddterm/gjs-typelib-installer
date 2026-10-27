@@ -49,12 +49,10 @@ dotest() {
 . /etc/os-release
 
 case "$ID-$VERSION_ID" in
-ubuntu-24.04 | ubuntu-25.04 | debian-13)
+ubuntu-24.04 | debian-13)
 	SKIP_GTK3=1;&  # Gtk 3 is a dependency of gjs on these distros. Fallthrough!
-alpine-3.20.* | alpine-3.21.* | alpine-3.22.* | fedora-* | centos-* | rhel-* | almalinux-* | opensuse-* | arch-*)
+fedora-* | centos-* | rhel-* | almalinux-* | opensuse-* | arch-*)
 	SKIP_FREEDESKTOP=1;;&  # cairo and other are dependencies of gjs
-alpine-3.20.* | alpine-3.21.*)
-	VTE4_WRONG_PACKAGE=1;;&  # https://gitlab.alpinelinux.org/alpine/aports/-/issues/17029
 opensuse-leap-16.*)
 	SEPARATE_GLIBUNIX=1;;&
 centos-* | rhel-* | almalinux-*)
@@ -84,12 +82,8 @@ dotest Adw-1
 
 doconfigure '-Dtypelibs=["Vte-2.91","Vte-3.91"]'
 
-if [ "$VTE4_WRONG_PACKAGE" = "1" ]; then
-	dotest Vte-2.91 Vte-3.91
-else
-	dotest Vte-2.91
-	dotest Vte-3.91
-fi
+dotest Vte-2.91
+dotest Vte-3.91
 
 doconfigure '-Dtypelibs=["Template-1.0"]'
 
