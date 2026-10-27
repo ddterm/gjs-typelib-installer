@@ -569,17 +569,22 @@ async function findPackageKitInstallCommand(cancellable = null) {
 export async function findInstallCommand(cancellable = null) {
     cancellable?.set_error_if_cancelled();
 
-    const packageKit = await findPackageKitInstallCommand(cancellable);
+    const osIds = getOsIdsCached();
 
-    if (packageKit)
-        return packageKit;
+    // PackageKit seems to be broken on openSUSE, at least within GNOME session
+    if (!osIds.includes('suse')) {
+        const packageKit = await findPackageKitInstallCommand(cancellable);
+
+        if (packageKit)
+            return packageKit;
+    }
 
     const pkexec = GLib.find_program_in_path('pkexec');
 
     if (!pkexec)
         return null;
 
-    for (const os of getOsIdsCached()) {
+    for (const os of osIds) {
         if (os === 'alpine') {
             const apk = GLib.find_program_in_path('apk');
 

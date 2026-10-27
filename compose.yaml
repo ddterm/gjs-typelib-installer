@@ -288,16 +288,6 @@ services:
       dockerfile: opensuse-leap-16.0.dockerfile
       target: base
 
-  opensuse-leap-16.0-packagekit:
-    <<: *x-service-packagekit
-    environment:
-      <<: *base-environment
-      BUILD_DIR: ${PWD}/tests/build-opensuse-leap-16.0-packagekit
-    build:
-      context: tests
-      dockerfile: opensuse-leap-16.0.dockerfile
-      target: packagekit
-
   opensuse-leap-16.1:
     <<: *x-service-base
     environment:
@@ -308,16 +298,6 @@ services:
       dockerfile: opensuse-leap-16.1.dockerfile
       target: base
 
-  opensuse-leap-16.1-packagekit:
-    <<: *x-service-packagekit
-    environment:
-      <<: *base-environment
-      BUILD_DIR: ${PWD}/tests/build-opensuse-leap-16.1-packagekit
-    build:
-      context: tests
-      dockerfile: opensuse-leap-16.1.dockerfile
-      target: packagekit
-
   opensuse-tumbleweed:
     <<: *x-service-base
     environment:
@@ -327,16 +307,6 @@ services:
       context: tests
       dockerfile: opensuse-tumbleweed.dockerfile
       target: base
-
-  opensuse-tumbleweed-packagekit:
-    <<: *x-service-packagekit
-    environment:
-      <<: *base-environment
-      BUILD_DIR: ${PWD}/tests/build-opensuse-tumbleweed-packagekit
-    build:
-      context: tests
-      dockerfile: opensuse-tumbleweed.dockerfile
-      target: packagekit
 
   archlinux:
     <<: *x-service-base
