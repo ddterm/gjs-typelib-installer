@@ -13,13 +13,20 @@ on:
   schedule:
     - cron: '48 7 * * *'
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}/${{ github.ref }}
+
 jobs:
   codeql:
-    runs-on: ubuntu-latest
+    name: codeql (${{ matrix.language }})
+    runs-on: ubuntu-26.04
 
     permissions:
       contents: read
-      security-events: write
+      security-events: write # upload SARIF results to GitHub code scanning
 
     strategy:
       fail-fast: false
@@ -33,23 +40,24 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: github/codeql-action/init@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
+      - uses: github/codeql-action/init@24c54180a607b1449ed407dd24f251e4e9147c8d # v4.38.3
         with:
           languages: ${{ matrix.language }}
           queries: security-and-quality
           config: |
             threat-models: local
 
-      - uses: github/codeql-action/analyze@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
+      - uses: github/codeql-action/analyze@24c54180a607b1449ed407dd24f251e4e9147c8d # v4.38.3
         with:
           category: '/language:${{matrix.language}}'
 
   zizmor:
+    name: zizmor
     runs-on: ubuntu-slim
 
     permissions:
       contents: read
-      security-events: write
+      security-events: write # upload SARIF results to GitHub code scanning
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -69,7 +77,7 @@ jobs:
           # renovate-digest: datasource=custom.github-release-assets depName=zizmor currentValue=1.31.1 packageName="zizmor-x86_64-unknown-linux-gnu.tar.gz" registryUrl=https://api.github.com/repos/zizmorcore/zizmor/releases
           ZIZMOR_SHA256: 'd185f726bdaf92df78273217dfdd24ebcd6b0ef48cf3ce776ff5762b6e138c99'
 
-      - run: zizmor --format=sarif . >"$RUNNER_TEMP/results.sarif"
+      - run: zizmor --format=sarif --pedantic . >"$RUNNER_TEMP/results.sarif"
         env:
           GH_TOKEN: ${{ github.token }}
 
