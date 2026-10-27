@@ -298,6 +298,26 @@ services:
       dockerfile: opensuse-leap-16.0.dockerfile
       target: packagekit
 
+  opensuse-leap-16.1:
+    <<: *x-service-base
+    environment:
+      <<: *base-environment
+      BUILD_DIR: ${PWD}/tests/build-opensuse-leap-16.1
+    build:
+      context: tests
+      dockerfile: opensuse-leap-16.1.dockerfile
+      target: base
+
+  opensuse-leap-16.1-packagekit:
+    <<: *x-service-packagekit
+    environment:
+      <<: *base-environment
+      BUILD_DIR: ${PWD}/tests/build-opensuse-leap-16.1-packagekit
+    build:
+      context: tests
+      dockerfile: opensuse-leap-16.1.dockerfile
+      target: packagekit
+
   opensuse-tumbleweed:
     <<: *x-service-base
     environment:
