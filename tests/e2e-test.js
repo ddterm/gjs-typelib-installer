@@ -34,7 +34,7 @@ async function main(srcPath, typelibs) {
     for (const arg of typelibs) {
         const [namespace, version, ...extra] = arg.split('-');
 
-        if (!version || extra.length) {
+        if (!namespace || !version || extra.length) {
             printerr(`Invalid argument ${arg}: should be in "Namespace-version" format, for example: Gtk-3.0`);
             return GNU_ERROR_RETURNCODE;
         }

@@ -7,14 +7,24 @@
 const {GLib, Gio} = imports.gi;
 const System = imports.system;
 
+/** @import {TypelibResolver} from './gjs-typelib-installer.js' */
+
+/**
+ * @param {string} srcPath
+ * @param {string} outputPath
+ * @param {string[]} typelibs
+ */
 async function main(srcPath, outputPath, typelibs) {
-    const {packages} = await import(GLib.filename_to_uri(srcPath, null));
+    const mod = /** @type {unknown} */ (await import(GLib.filename_to_uri(srcPath, null)));
+    /** @type {{packages: Partial<Record<string, Partial<Record<string, TypelibResolver>>>>}} */
+    const {packages} = /** @type {import('./gjs-typelib-installer.js')} */ (mod);
+    /** @type {typeof packages} */
     const includeNamespaces = {};
 
     for (const spec of typelibs) {
         const [namespace, version, ...extra] = spec.split('-');
 
-        if (!version || extra.length) {
+        if (!namespace || !version || extra.length) {
             printerr(`Invalid argument ${spec}: should be in "Namespace-version" format, for example: Gtk-3.0`);
             return 1;
         }
@@ -26,6 +36,7 @@ async function main(srcPath, outputPath, typelibs) {
             return 1;
         }
 
+        /** @type {Partial<Record<string, TypelibResolver>>} */
         const versions = includeNamespaces[namespace] ?? {};
 
         versions[version] = func;
@@ -36,8 +47,10 @@ async function main(srcPath, outputPath, typelibs) {
     const srcText = new TextDecoder().decode(srcBytes);
     const indent = '    ';
     const replaceText = Object.entries(includeNamespaces).map(([namespace, versions]) => {
-        const versionsText = Object.entries(versions).map(
-            ([version, func]) => `${indent}${indent}'${version}': ${func.toString()},`
+        const versionsText = Object.entries(
+            /** @type {Partial<Record<string, TypelibResolver>>} */ (versions)
+        ).map(
+            ([version, func]) => `${indent}${indent}'${version}': ${/** @type {TypelibResolver} */ (func).toString()},`
         ).join('\n');
 
         return `${indent}${namespace}: {\n${versionsText}\n${indent}},`;
@@ -91,12 +104,12 @@ app.set_option_context_parameter_string('-- Namespace-version Namespace-versionâ
 
 app.connect('handle-local-options', (_, options) => {
     const srcPath = GLib.canonicalize_filename(
-        options.lookup('input', 's') ?? 'gjs-typelib-installer.js',
+        /** @type {string|null} */ (options.lookup('input', 's')) ?? 'gjs-typelib-installer.js',
         null
     );
 
-    const outputPath = options.lookup('output', 's');
-    const typelibs = options.lookup(GLib.OPTION_REMAINING, 'as', true);
+    const outputPath = /** @type {unknown} */ (options.lookup('output', 's'));
+    const typelibs = /** @type {unknown} */ (options.lookup(GLib.OPTION_REMAINING, 'as', true));
 
     if (!typelibs) {
         printerr('No namespaces/libraries specified');
@@ -105,7 +118,11 @@ app.connect('handle-local-options', (_, options) => {
 
     app.hold();
 
-    main(srcPath, outputPath, typelibs).catch(error => {
+    void main(
+        srcPath,
+        /** @type {string} */ (outputPath),
+        /** @type {string[]} */ (typelibs)
+    ).catch((/** @type {unknown} */ error) => {
         logError(error);
         return 1;
     }).then(exitCode => {
@@ -116,5 +133,5 @@ app.connect('handle-local-options', (_, options) => {
     return -1;
 });
 
-app.connect('activate', () => {});
+app.connect('activate', () => { /* empty */ });
 app.run([System.programInvocationName, ...System.programArgs]);
