@@ -15,7 +15,6 @@ import Gi from 'gi';
 /**
  * Extract the version prefix by removing the last component.
  *
- * @private
  * @param {string} version - The version string.
  * @returns {string} The version prefix without the last component, or an empty string.
  */
@@ -30,7 +29,6 @@ function getVersionPrefix(version) {
  * Generates version-specific IDs (e.g., "debian:12", "debian:11")
  * and includes ID_LIKE entries for derivative distributions.
  *
- * @private
  * @returns {string[]} The list of OS identifiers.
  */
 function getOsIds() {
@@ -64,7 +62,6 @@ function getOsIds() {
 /**
  * The cached list of OS identifiers for package resolution.
  *
- * @private
  * @type {string[]|undefined}
  */
 let cachedOsIds;
@@ -72,7 +69,6 @@ let cachedOsIds;
 /**
  * Get the cached list of OS identifiers for package resolution.
  *
- * @private
  * @returns {string[]} The cached list of OS identifiers.
  */
 function getOsIdsCached() {
@@ -82,19 +78,19 @@ function getOsIdsCached() {
 }
 
 /**
+ * @typedef TypelibInfo
  * Information about a typelib dependency - an object with the typelib file name
  * and an optional list of OS packages to install.
  *
- * @typedef TypelibInfo
  * @property {string} filename - The file name of the library.
  * @property {string[]|null} [packages] - The list of OS packages that need to be
  * installed to use this library.
  */
 
 /**
+ * @callback TypelibResolver
  * A function that resolves typelib package name(s) for the current distro.
  *
- * @callback TypelibResolver
  * @returns {TypelibInfo} The typelib file name and an optional package list.
  */
 
@@ -102,7 +98,6 @@ function getOsIdsCached() {
  * Resolve a typelib file name to package information based on the OS ID.
  * Iterates through the cached OS IDs and returns the first matching distro entry.
  *
- * @private
  * @param {string} filename - The typelib filename to resolve.
  * @param {Partial<Record<string,string[]|null>>} distros - A mapping of OS IDs to package lists.
  * @returns {TypelibInfo} The typelib information with filename and optional packages.
@@ -126,8 +121,20 @@ function resolveByOsId(filename, distros) {
  * @example Get the package name for Gtk 4.0 on the current OS
  * {@includeCode examples/gtk4-pkg-name.js#example}
  */
+/* eslint-disable jsdoc/require-returns */
 export const packages = {
+    /**
+     * Package definitions for libadwaita.
+     *
+     * @see https://gnome.pages.gitlab.gnome.org/libadwaita/
+     */
     Adw: {
+        /**
+         * Resolve OS package(s) for `gi://Adw?version=1` import.
+         *
+         * @see https://gjs-docs.gnome.org/adw1~1/
+         * @see https://gnome.pages.gitlab.gnome.org/libadwaita/doc/1-latest/
+         */
         '1': () => resolveByOsId('Adw-1.typelib', {
             alpine: ['libadwaita'],
             arch: ['libadwaita'],
@@ -136,7 +143,18 @@ export const packages = {
             suse: ['typelib-1_0-Adw-1'],
         }),
     },
+    /**
+     * Package definitions for GDK.
+     *
+     * @see https://www.gtk.org/
+     */
     Gdk: {
+        /**
+         * Resolve OS package(s) for `gi://Gdk?version=3.0` import.
+         *
+         * @see https://gjs-docs.gnome.org/gdk30~3.0/
+         * @see https://docs.gtk.org/gdk3/
+         */
         '3.0': () => resolveByOsId('Gdk-3.0.typelib', {
             alpine: ['gtk+3.0'],
             arch: ['gtk3'],
@@ -144,6 +162,12 @@ export const packages = {
             fedora: ['gtk3'],
             suse: ['typelib-1_0-Gtk-3_0'],
         }),
+        /**
+         * Resolve OS package(s) for `gi://Gdk?version=4.0` import.
+         *
+         * @see https://gjs-docs.gnome.org/gdk40~4.0/
+         * @see https://docs.gtk.org/gdk4/
+         */
         '4.0': () => resolveByOsId('Gdk-4.0.typelib', {
             alpine: ['gtk4.0'],
             arch: ['gtk4'],
@@ -152,7 +176,18 @@ export const packages = {
             suse: ['typelib-1_0-Gtk-4_0'],
         }),
     },
+    /**
+     * Package definitions for GTK.
+     *
+     * @see https://www.gtk.org/
+     */
     Gtk: {
+        /**
+         * Resolve OS package(s) for `gi://Gtk?version=3.0` import.
+         *
+         * @see https://gjs-docs.gnome.org/gtk30~3.0/
+         * @see https://docs.gtk.org/gtk3/
+         */
         '3.0': () => resolveByOsId('Gtk-3.0.typelib', {
             alpine: ['gtk+3.0'],
             arch: ['gtk3'],
@@ -160,6 +195,12 @@ export const packages = {
             fedora: ['gtk3'],
             suse: ['typelib-1_0-Gtk-3_0'],
         }),
+        /**
+         * Resolve OS package(s) for `gi://Gtk?version=4.0` import.
+         *
+         * @see https://gjs-docs.gnome.org/gtk40~4.0/
+         * @see https://docs.gtk.org/gtk4/
+         */
         '4.0': () => resolveByOsId('Gtk-4.0.typelib', {
             alpine: ['gtk4.0'],
             arch: ['gtk4'],
@@ -168,7 +209,18 @@ export const packages = {
             suse: ['typelib-1_0-Gtk-4_0'],
         }),
     },
+    /**
+     * Package definitions for libhandy.
+     *
+     * @see https://gnome.pages.gitlab.gnome.org/libhandy/
+     */
     Handy: {
+        /**
+         * Resolve OS package(s) for `gi://Handy?version=1` import.
+         *
+         * @see https://gjs-docs.gnome.org/handy1~1/
+         * @see https://gnome.pages.gitlab.gnome.org/libhandy/doc/1-latest/
+         */
         '1': () => resolveByOsId('Handy-1.typelib', {
             alpine: ['libhandy1'],
             arch: ['libhandy'],
@@ -177,7 +229,18 @@ export const packages = {
             suse: ['typelib-1_0-Handy-1_0'],
         }),
     },
+    /**
+     * Package definitions for Cairo.
+     *
+     * @see https://www.cairographics.org/
+     */
     cairo: {
+        /**
+         * Resolve OS package(s) for `gi://cairo?version=1.0` import.
+         *
+         * @see https://gjs-docs.gnome.org/cairo10~1.0/
+         * @see https://www.cairographics.org/manual/
+         */
         '1.0': () => resolveByOsId('cairo-1.0.typelib', {
             alpine: ['gobject-introspection'],
             arch: ['gobject-introspection-runtime'],
@@ -186,7 +249,18 @@ export const packages = {
             suse: ['girepository-1_0'],
         }),
     },
+    /**
+     * Package definitions for Pango.
+     *
+     * @see https://www.pango.org/
+     */
     Pango: {
+        /**
+         * Resolve OS package(s) for `gi://Pango?version=1.0` import.
+         *
+         * @see https://gjs-docs.gnome.org/pango10~1.0/
+         * @see https://docs.gtk.org/Pango/
+         */
         '1.0': () => resolveByOsId('Pango-1.0.typelib', {
             alpine: ['pango'],
             arch: ['pango'],
@@ -195,7 +269,18 @@ export const packages = {
             suse: ['typelib-1_0-Pango-1_0'],
         }),
     },
+    /**
+     * Package definitions for VTE.
+     *
+     * @see https://gnome.pages.gitlab.gnome.org/vte/
+     */
     Vte: {
+        /**
+         * Resolve OS package(s) for `gi://Vte?version=2.91` import.
+         *
+         * @see https://gjs-docs.gnome.org/vte291~2.91/
+         * @see https://gnome.pages.gitlab.gnome.org/vte/gtk3/
+         */
         '2.91': () => resolveByOsId('Vte-2.91.typelib', {
             alpine: ['vte3'],
             arch: ['vte3'],
@@ -203,6 +288,12 @@ export const packages = {
             fedora: ['vte291'],
             suse: ['typelib-1_0-Vte-2_91'],
         }),
+        /**
+         * Resolve OS package(s) for `gi://Vte?version=3.91` import.
+         *
+         * @see https://gjs-docs.gnome.org/vte391~3.91/
+         * @see https://gnome.pages.gitlab.gnome.org/vte/gtk4/
+         */
         '3.91': () => resolveByOsId('Vte-3.91.typelib', {
             alpine: ['vte3-gtk4'],
             arch: ['vte4'],
@@ -211,7 +302,18 @@ export const packages = {
             suse: ['typelib-1_0-Vte-3_91'],
         }),
     },
+    /**
+     * Package definitions for GioUnix.
+     *
+     * @see https://gitlab.gnome.org/GNOME/glib/
+     */
     GioUnix: {
+        /**
+         * Resolve OS package(s) for `gi://GioUnix?version=2.0` import.
+         *
+         * @see https://gjs-docs.gnome.org/giounix20~2.0/
+         * @see https://docs.gtk.org/gio/
+         */
         '2.0': () => resolveByOsId('GioUnix-2.0.typelib', {
             alpine: ['glib'],
             arch: ['glib2'],
@@ -220,7 +322,18 @@ export const packages = {
             suse: ['typelib-1_0-Gio-2_0'],
         }),
     },
+    /**
+     * Package definitions for GLibUnix.
+     *
+     * @see https://gitlab.gnome.org/GNOME/glib/
+     */
     GLibUnix: {
+        /**
+         * Resolve OS package(s) for `gi://GLibUnix?version=2.0` import.
+         *
+         * @see https://gjs-docs.gnome.org/glibunix20~2.0/
+         * @see https://docs.gtk.org/glib/
+         */
         '2.0': () => resolveByOsId('GLibUnix-2.0.typelib', {
             alpine: ['glib'],
             arch: ['glib2'],
@@ -229,7 +342,17 @@ export const packages = {
             suse: ['typelib-1_0-GLibUnix-2_0'],
         }),
     },
+    /**
+     * Package definitions for Template-GLib.
+     *
+     * @see https://gitlab.gnome.org/GNOME/template-glib
+     */
     Template: {
+        /**
+         * Resolve OS package(s) for `gi://Template?version=1.0` import.
+         *
+         * @see https://gnome.pages.gitlab.gnome.org/template-glib/template-glib-1.0/
+         */
         '1.0': () => resolveByOsId('Template-1.0.typelib', {
             alpine: ['template-glib'],
             arch: ['template-glib'],
@@ -240,6 +363,7 @@ export const packages = {
         }),
     },
 };
+/* eslint-enable jsdoc/require-returns */
 
 /**
  * An error thrown when GObject typelibs are missing.
@@ -253,6 +377,14 @@ export class MissingDependencies extends Error {
      * @type {Set<string>}
      */
     packages;
+
+    /**
+     * The error name.
+     *
+     * @type {string}
+     * @override
+     */
+    name;
 
     /**
      * The set of missing typelib filenames.
@@ -353,7 +485,6 @@ export function require(versions) {
 /**
  * Quote and join command line arguments for shell execution.
  *
- * @private
  * @param {Iterable<string>|Array<string>} argv - Command line arguments.
  * @returns {string} The shell-quoted and joined command string.
  */
@@ -365,7 +496,9 @@ function shellJoin(argv) {
 }
 
 /**
- * @private
+ * A Promise wrapper for Gio.Subprocess.wait_check_async(), without relying on
+ * Gio._promisify().
+ *
  * @param {Gio.Subprocess} subprocess - The subprocess to wait for.
  * @param {Gio.Cancellable | null} cancellable - The cancellable object or null.
  * @returns {Promise<void>}
@@ -385,7 +518,9 @@ function waitCheck(subprocess, cancellable) {
 }
 
 /**
- * @private
+ * A Promise wrapper for Gio.Subprocess.communicate_utf8_async(), without relying on
+ * Gio._promisify().
+ *
  * @param {Gio.Subprocess} subprocess - The subprocess to communicate with.
  * @param {string | null} stdinBuf - The data to send to stdin or null.
  * @param {Gio.Cancellable | null} cancellable - Optional cancellable for aborting the operation.
@@ -410,7 +545,6 @@ function communicateUtf8(subprocess, stdinBuf, cancellable) {
 /**
  * Spawn a subprocess, wait for it to terminate, and get its stdout as a string.
  *
- * @private
  * @param {string[]} argv - The command line.
  * @param {Gio.Cancellable|null} cancellable - Optional cancellable for aborting the operation.
  * @returns {Promise<string>} The subprocess stdout as a string.
@@ -440,7 +574,6 @@ async function getSubprocessOutput(argv, cancellable = null) {
  * Parse the JSON output from the 'pkgcli --json backend' command.
  * Extracts and validates the roles array from the JSON response.
  *
- * @private
  * @param {string} stdout - The output of 'pkgcli --json backend'.
  * @returns {unknown[]} The roles as an array.
  */
@@ -465,9 +598,9 @@ function parsePkgCliRoles(stdout) {
 }
 
 /**
+ * @callback InstallCommandResolver
  * A function that, given a list of packages, generates the installation command.
  *
- * @callback InstallCommandResolver
  * @param {Iterable<string>} pkgs - The list of package names to install.
  * @returns {string[]} The command line, as an argument list (argv).
  */
@@ -477,7 +610,6 @@ function parsePkgCliRoles(stdout) {
  * Checks for the pkgcli and pkcon utilities, returning a function that generates
  * the appropriate installation command with cache refresh if supported.
  *
- * @private
  * @param {Gio.Cancellable|null} cancellable - Optional cancellable for
  * aborting the operation.
  * @returns {Promise<InstallCommandResolver|null>} A function that generates
@@ -616,10 +748,10 @@ export async function findInstallCommand(cancellable = null) {
 }
 
 /**
+ * @callback TerminalCommandResolver
  * A function that, given a list of arguments, generates the command line
  * to run the specified command in a terminal emulator.
  *
- * @callback TerminalCommandResolver
  * @param {Iterable<string>} argv - The command line arguments to run in a terminal.
  * @returns {string[]} The command line, as an argument list (argv).
  */
